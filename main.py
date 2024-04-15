@@ -27,6 +27,7 @@ fig2 = px.scatter(df2, x="gdp per capita", y="life expectancy",
 app.layout = html.Div([
     html.H1('Hello Dash'),
     html.P('Jacob was here'),
+    html.P('Chris was here'),
 
     html.Div('''
         Dash: A web application framework for your data. 
