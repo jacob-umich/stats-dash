@@ -32,7 +32,7 @@ app.layout = html.Div([
     html.P('Amanda was here'),
 
     html.Div('''
-        Dash: A web application framework for your data. 
+        Dash: A web application framework for your data. A small change has been made. 
     '''),
 
     dcc.Graph(
