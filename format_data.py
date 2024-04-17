@@ -68,9 +68,30 @@ def clean_main():
 
     # remove alt data value because only 5 records have it filled
     out = data[ data["DataValue"].fillna(0)!=data["DataValueAlt"].fillna(0)][["Question","DataValue","DataValueAlt"]]
+
     
+    # remove datafootnotesymbol because its one-to-one with footnote
     out = data[["DataValueFootnoteSymbol","DataValueFootnote"]].dropna()
-    print(out)
+    out = out.groupby(["DataValueFootnote","DataValueFootnoteSymbol"]).size()
+
+    # Geolocation is the same for every state
+    out = data["Geolocation"].unique()
+
+    # out = data[(data["DataValue"].isna()) & (data["LocationAbbr"]=="VI") & (data["Question"]=="Binge drinking prevalence among high school students")]
+
+    # if data value footnote is not present then datavalue is a number
+    out =  data[(data["DataValueFootnote"].isna())]["DataValue"].isna().any()
+
+    # some data value footnote are present when data value is present. these notes are mainly to advise caution or because no cases were reported
+    out =  data[~(data["DataValueFootnote"].isna())&~(data["DataValue"].isna())]["DataValueFootnote"].unique()
+
+    # vaping data says no data available even though it is. fixing this
+    out =  data[~(data["DataValueFootnote"].isna())&~(data["DataValue"].isna())&(data["DataValueFootnote"]=="No data available")]
+
+    data = data[~(data["DataValueFootnote"].isna())&~(data["DataValue"].isna())&(data["DataValueFootnote"]=="No data available")]
+    with open("temp.md","wt") as f:
+        out.to_markdown(buf=f)
+    # print(out)
 
     data = data[[
         "YearStart",
@@ -82,8 +103,15 @@ def clean_main():
         "DataValueUnit",
         "DataValueType",
         "DataValue",
-        "DataValueFootnoteSymbol",
         "DataValueFootnote",
+        "LowConfidenceLimit",
+        "StratificationCategory1",
+        "Stratification1",
+        "StratificationCategory2",
+        "Stratification2",
+        "StratificationCategory3",
+        "Stratification3",
     ]]
+
 
 clean_main()
