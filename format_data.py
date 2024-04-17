@@ -77,22 +77,6 @@ def clean_main():
     # Geolocation is the same for every state
     out = data["Geolocation"].unique()
 
-    # out = data[(data["DataValue"].isna()) & (data["LocationAbbr"]=="VI") & (data["Question"]=="Binge drinking prevalence among high school students")]
-
-    # if data value footnote is not present then datavalue is a number
-    out =  data[(data["DataValueFootnote"].isna())]["DataValue"].isna().any()
-
-    # some data value footnote are present when data value is present. these notes are mainly to advise caution or because no cases were reported
-    out =  data[~(data["DataValueFootnote"].isna())&~(data["DataValue"].isna())]["DataValueFootnote"].unique()
-
-    # vaping data says no data available even though it is. fixing this
-    out =  data[~(data["DataValueFootnote"].isna())&~(data["DataValue"].isna())&(data["DataValueFootnote"]=="No data available")]
-
-    data = data[~(data["DataValueFootnote"].isna())&~(data["DataValue"].isna())&(data["DataValueFootnote"]=="No data available")]
-    with open("temp.md","wt") as f:
-        out.to_markdown(buf=f)
-    # print(out)
-
     data = data[[
         "YearStart",
         "YearEnd",
@@ -105,6 +89,7 @@ def clean_main():
         "DataValue",
         "DataValueFootnote",
         "LowConfidenceLimit",
+        "HighConfidenceLimit",
         "StratificationCategory1",
         "Stratification1",
         "StratificationCategory2",
@@ -112,6 +97,50 @@ def clean_main():
         "StratificationCategory3",
         "Stratification3",
     ]]
+    # out = data[(data["DataValue"].isna()) & (data["LocationAbbr"]=="VI") & (data["Question"]=="Binge drinking prevalence among high school students")]
+
+    # if data value footnote is not present then datavalue is a number
+    out =  data[(data["DataValueFootnote"].isna())]["DataValue"].isna().any()
+
+    # some data value footnote are present when data value is present. these notes are mainly to advise caution or because no cases were reported
+    out =  data[~(data["DataValueFootnote"].isna())&~(data["DataValue"].isna())]["DataValueFootnote"].unique()
+
+    # vaping data says no data available even though it is. fixing this
+    out =  data[~(data["DataValueFootnote"].isna())&~(data["DataValue"].isna())&(data["DataValueFootnote"]=="No data available")]
+
+    data.loc[~(data["DataValueFootnote"].isna())&~(data["DataValue"].isna())&(data["DataValueFootnote"]=="No data available"),"DataValueFootnote"]=pd.NA
+    out =  data[~(data["DataValueFootnote"].isna())&~(data["DataValue"].isna())]["DataValueFootnote"].unique()
+
+    # if any datavalue is nan, then it has a footnote to explain why
+    out = data[(data["DataValue"].isna())&(data["DataValueFootnote"]).isna()]
+
+    # if there is no confidence limit, the unit type could be number
+    out = data[(data["LowConfidenceLimit"].isna())&~(data["DataValue"].isna())].head(20)
+
+    # if there is no datavalue, there is no lower limit
+    out = data[(data["DataValue"].isna())]["LowConfidenceLimit"].isna().all()
+
+    # print(out)
+    # other units, like gallons have no upper or lower limit.
+    out = data[(data["LowConfidenceLimit"].isna())&~(data["DataValue"].isna())&~(data["DataValueType"]=="Number")]
+
+    with open("temp.md","wt") as f:
+        out.to_markdown(buf=f)
+
+    # see all unit types that have data values but no limits.
+    out = data[(data["LowConfidenceLimit"].isna())&~(data["DataValue"].isna())&~(data["DataValueType"]=="Number")].groupby("DataValueUnit").size()
+
+    # i dont see a reason for there to not be confidence limits. I will assume
+    # its because they are exact values and we can fill them with the data value
+    data.loc[(data["LowConfidenceLimit"].isna())&~(data["DataValue"].isna()), "LowConfidenceLimit"]= data.loc[(data["LowConfidenceLimit"].isna())&~(data["DataValue"].isna()),"DataValue"]
+    data.loc[(data["HighConfidenceLimit"].isna())&~(data["DataValue"].isna()), "HighConfidenceLimit"]= data.loc[(data["HighConfidenceLimit"].isna())&~(data["DataValue"].isna()),"DataValue"]
+
+    # data is clean
+    out = data[(data["LowConfidenceLimit"].isna())&~(data["DataValue"].isna())]
+
+    # with open("temp.md","wt") as f:
+    #     out.to_markdown(buf=f)
+
 
 
 clean_main()
