@@ -29,6 +29,7 @@ app.layout = html.Div([
     html.P('Jacob was here'),
     html.P('Chris was here'),
     html.P('Alyssa was here'),
+    html.P('Amanda was here'),
 
     html.Div('''
         Dash: A web application framework for your data. 
