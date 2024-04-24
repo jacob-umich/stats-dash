@@ -4,6 +4,27 @@ def get_main():
     data = pd.read_csv('Chronic_Disease_Indicators.csv')
     return data
 
+def get_life_expectancy():
+    life_data = pd.read_csv('life_expectancy.csv')
+    state_mapping = {
+        'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California',
+        'CO': 'Colorado', 'CT': 'Connecticut', 'DE': 'Delaware', 'FL': 'Florida', 'GA': 'Georgia',
+        'HI': 'Hawaii', 'ID': 'Idaho', 'IL': 'Illinois', 'IN': 'Indiana', 'IA': 'Iowa', 'KS': 'Kansas',
+        'KY': 'Kentucky', 'LA': 'Louisiana', 'ME': 'Maine', 'MD': 'Maryland', 'MA': 'Massachusetts',
+        'MI': 'Michigan', 'MN': 'Minnesota', 'MS': 'Mississippi', 'MO': 'Missouri', 'MT': 'Montana',
+        'NE': 'Nebraska', 'NV': 'Nevada', 'NH': 'New Hampshire', 'NJ': 'New Jersey', 'NM': 'New Mexico',
+        'NY': 'New York', 'NC': 'North Carolina', 'ND': 'North Dakota', 'OH': 'Ohio', 'OK': 'Oklahoma',
+        'OR': 'Oregon', 'PA': 'Pennsylvania', 'RI': 'Rhode Island', 'SC': 'South Carolina',
+        'SD': 'South Dakota', 'TN': 'Tennessee', 'TX': 'Texas', 'UT': 'Utah', 'VT': 'Vermont',
+        'VA': 'Virginia', 'WA': 'Washington', 'WV': 'West Virginia', 'WI': 'Wisconsin', 'WY': 'Wyoming'
+    }
+    life_data['STATE'] = life_data['STATE'].map(state_mapping)
+    life_data = life_data[life_data['YEAR'] == 2019]
+    life_data.drop(columns=['URL'], inplace=True)
+    life_data_low = life_data.sort_values(by='RATE').nsmallest(5, 'RATE')
+    life_data_high = life_data.sort_values(by='RATE').nlargest(5, 'RATE')
+    return life_data_low, life_data_high
+
 def state_filter ():
   data = get_main()
   us_states = [
