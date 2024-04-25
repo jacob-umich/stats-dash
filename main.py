@@ -45,7 +45,15 @@ app.layout = html.Div([
             "height":"70vh",
         }
     ),
-    cdc.explanation_component("eda_3.md",header="Life Expectancy Analysis")
+    cdc.explanation_component("eda_3.md",header="Life Expectancy Analysis"),
+    dcc.RadioItems([2018,2019,2020],style={"width":"150px"},id='le_bar_year',value=2019),
+    dcc.Graph(
+        id='le_bar',
+        style={
+            "wdith":"40vh",
+            "height":"70vh",
+        }
+    ),
 ])
 
 if __name__ == '__main__':
