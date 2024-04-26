@@ -7,6 +7,7 @@ import custom_dash_component as cdc
 import eda_plots
 import pandas as pd
 import data_handler as dh
+
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__,external_stylesheets=external_stylesheets)
 server = app.server
@@ -18,6 +19,16 @@ server = app.server
 
 questions = dh.get_cdi_field('locationdesc')["locationdesc"].unique()
 states = dh.get_cdi_field("question")["question"].unique()
+df = dh.get_all_cdi()
+dis_ques = df[df["topic"]=="Disability"]["question"].unique()
+dis_year = df[df["topic"]=="Disability"]["yearstart"].unique()
+diab_ques = df[df["topic"]=="Diabetes"]["question"].unique()
+diab_year = df[df["topic"]=="Diabetes"]["yearstart"].unique()
+states_df = dh.get_cdi_cond(
+        "topic, yearstart, datavaluetype,stratificationcategory1,locationdesc,datavalue,question,locationabbr",
+        'locationdesc',
+        dh.us_states
+        )
 
 app.layout = html.Div([
     cdc.explanation_component("introduction.md",header = "Introduction"),
@@ -49,6 +60,50 @@ app.layout = html.Div([
     dcc.RadioItems([2018,2019,2020],style={"width":"150px"},id='le_bar_year',value=2019),
     dcc.Graph(
         id='le_bar',
+        style={
+            "wdith":"40vh",
+            "height":"70vh",
+        }
+    ),
+    dcc.RadioItems([2018,2019,2020],style={"width":"150px"},id='le_map_year',value=2019),
+    dcc.Graph(
+        id='le_map',
+        style={
+            "wdith":"40vh",
+            "height":"70vh",
+        }
+    ),
+    dcc.RadioItems(dis_year,style={"width":"150px"},id='dis_bar_year',value=2019),
+    dcc.Dropdown(dis_ques,style={"width":"1000px"},id='dis_bar_ques_drop',value="Adults with any disability"),
+    dcc.Graph(
+        id='dis_bar',
+        style={
+            "wdith":"40vh",
+            "height":"70vh",
+        }
+    ),
+    dcc.RadioItems(dis_year,style={"width":"150px"},id='dis_map_year',value=2019),
+    dcc.Dropdown(dis_ques,style={"width":"1000px"},id='dis_map_ques_drop',value="Adults with any disability"),
+    dcc.Graph(
+        id='dis_map',
+        style={
+            "wdith":"40vh",
+            "height":"70vh",
+        }
+    ),
+    dcc.RadioItems(diab_year,style={"width":"150px"},id='diab_bar_year',value=2019),
+    dcc.Dropdown(diab_ques,style={"width":"1000px"},id='diab_bar_ques_drop',value="Diabetes among adults"),
+    dcc.Graph(
+        id='diab_bar',
+        style={
+            "wdith":"40vh",
+            "height":"70vh",
+        }
+    ),
+    dcc.RadioItems(diab_year,style={"width":"150px"},id='diab_map_year',value=2019),
+    dcc.Dropdown(diab_ques,style={"width":"1000px"},id='diab_map_ques_drop',value="Diabetes among adults"),
+    dcc.Graph(
+        id='diab_map',
         style={
             "wdith":"40vh",
             "height":"70vh",
