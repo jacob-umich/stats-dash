@@ -32,6 +32,11 @@ def get_all_cdi():
         cdi = pd.read_sql_query("select * from cdi", con)
     return cdi
 
+def get_all_le():
+    with db.connect("health.db") as con:
+        cdi = pd.read_sql_query("select * from le", con)
+    return cdi
+
 
 def get_cdi_question(question):
     with db.connect("health.db") as con:
