@@ -38,13 +38,14 @@ app.layout = html.Div([
         dcc.Graph(
             id='questions_plot',
             style={
-                "wdith":"40vh",
+                "width":"100%",
                 "height":"3000px",
             }
         ),
     ],style={
         "overflowY":"scroll",
         "height":"500px",
+        "width":"100%"
 
     }),
     cdc.explanation_component("eda_2.md",header = "Location Distribution"),
@@ -52,7 +53,15 @@ app.layout = html.Div([
     dcc.Graph(
         id='locale',
         style={
-            "wdith":"40vh",
+            "width":"100%",
+            "height":"70vh",
+        }
+    ),
+    dcc.Graph(
+        id='strat',
+        figure = eda_plots.tree_strat(),
+        style={
+            "width":"100%",
             "height":"70vh",
         }
     ),
@@ -61,7 +70,7 @@ app.layout = html.Div([
     dcc.Graph(
         id='le_bar',
         style={
-            "wdith":"40vh",
+            "width":"100%",
             "height":"70vh",
         }
     ),
@@ -69,7 +78,7 @@ app.layout = html.Div([
     dcc.Graph(
         id='le_map',
         style={
-            "wdith":"40vh",
+            "width":"100%",
             "height":"70vh",
         }
     ),
@@ -78,7 +87,7 @@ app.layout = html.Div([
     dcc.Graph(
         id='dis_bar',
         style={
-            "wdith":"40vh",
+            "width":"100%",
             "height":"70vh",
         }
     ),
@@ -87,7 +96,7 @@ app.layout = html.Div([
     dcc.Graph(
         id='dis_map',
         style={
-            "wdith":"40vh",
+            "width":"100%",
             "height":"70vh",
         }
     ),
@@ -96,7 +105,7 @@ app.layout = html.Div([
     dcc.Graph(
         id='diab_bar',
         style={
-            "wdith":"40vh",
+            "width":"100%",
             "height":"70vh",
         }
     ),
@@ -105,11 +114,20 @@ app.layout = html.Div([
     dcc.Graph(
         id='diab_map',
         style={
-            "wdith":"40vh",
+            "width":"100%",
             "height":"70vh",
         }
     ),
-])
+],
+style={
+    "width":"100vw",
+    "display":"flex",
+    "align-items":"center",
+    "flex-direction":"column",
+    "padding":"0 6em",
+    "box-sizing":'border-box',
+    "background-color":"#1C506C"
+})
 
 if __name__ == '__main__':
     app.run_server(debug=True, port=8080)

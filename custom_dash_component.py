@@ -26,7 +26,7 @@ def explanation_component(md_file,id=None,header=None):
             "display":"flex",
             "flex-direction":"column",
             "align-items":"center",
-            "background-color":"tan"
+            "color":"#DBF7EC"
         }
     )
     return outer_div

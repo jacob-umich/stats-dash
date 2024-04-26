@@ -29,6 +29,22 @@ def location_plot(question=None):
     fig = px.choropleth(data,locationmode="USA-states",scope="usa",locations=data['locationabbr'],color=data['count'])
     return fig
 
+def tree_strat():
+    data = dh.get_cdi_field("topic, question,datavaluetype,stratification1")
+
+
+    data = data.groupby(["topic","question","datavaluetype","stratification1"]).size().to_frame("count").reset_index()
+
+
+    fig = px.sunburst(
+        data, 
+        path=["topic","question","datavaluetype","stratification1"],
+        values='count'
+    )
+    return fig
+
+
+
 @dash.callback(
     dash.Output(component_id="le_bar",component_property="figure"),
     dash.Input(component_id='le_bar_year',component_property="value")
