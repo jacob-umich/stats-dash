@@ -1,0 +1,3 @@
+The above information helps us to understand the breadth of questioning that is included in the dataset. All of the data entries contain aggregated repsonses either for the whole state or sub stratifications, like sex or age. To see that some states have less responses than others might just mean there was less stratification in their data. 
+
+Now that we understand the data, we can start to look for more meaningful answers. To help with this, we will compound this dataset with a life expectancy data set from the CDC

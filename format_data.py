@@ -1,5 +1,6 @@
 import pandas as pd
-import sqlite3
+import SHOD_cleaning_data
+import sqlite3 as db
 
 def get_main():
     data = pd.read_csv("data/Chronic_Disease_Indicators.csv")
@@ -137,10 +138,21 @@ def clean_main():
 
     # data is clean
     out = data[(data["LowConfidenceLimit"].isna())&~(data["DataValue"].isna())]
+    data = data.rename(lambda x:x.lower().replace(" ","_"),axis=1)
+    with open("temp.md","wt") as f:
+        data.head(20).to_markdown(buf=f)
+    return data
 
-    # with open("temp.md","wt") as f:
-    #     out.to_markdown(buf=f)
 
+def clean_le():
+    data = SHOD_cleaning_data.get_life_expectancy()
+    data = data.rename(lambda x:x.lower(),axis=1)
+    return data
 
-
-clean_main()
+def generate_sqldb():
+    con = db.connect("health.db")
+    main = clean_main()
+    le = clean_le()
+    main.to_sql("cdi",con,if_exists='replace')
+    le.to_sql("le",con,if_exists='replace')
+generate_sqldb()

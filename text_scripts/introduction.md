@@ -1,0 +1,1 @@
+This webpage presents an analysis of health data. Specifically it presents several trends related to chronic disease indicators and life expectancy in the united states of America. Along with trend analysis, A machine learning model is produced from this data to provide prediction capabilities.

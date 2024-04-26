@@ -3,53 +3,131 @@
 import dash
 from dash import dcc
 from dash import html
-import plotly.express as px
+import custom_dash_component as cdc
+import eda_plots
 import pandas as pd
+import data_handler as dh
 
-app = dash.Dash(__name__)
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dash(__name__,external_stylesheets=external_stylesheets)
 server = app.server
 
+
+
+
 # see https://plotly.com/python/px-arguments/ for more options
-df = pd.DataFrame({
-    "Fruit": ["Apples", "Oranges", "Bananas", "Apples", "Oranges", "Bananas"],
-    "Amount": [4, 1, 2, 2, 4, 5],
-    "City": ["SF", "SF", "SF", "Montreal", "Montreal", "Montreal"]
-})
 
-fig = px.bar(df, x="Fruit", y="Amount", color="City", barmode="group")
-
-df2 = pd.read_csv('https://gist.githubusercontent.com/chriddyp/5d1ea79569ed194d432e56108a04d188/raw/a9f9e8076b837d541398e999dcbac2b2826a81f8/gdp-life-exp-2007.csv')
-
-fig2 = px.scatter(df2, x="gdp per capita", y="life expectancy",
-                 size="population", color="continent", hover_name="country",
-                 log_x=True, size_max=60)
+questions = dh.get_cdi_field('locationdesc')["locationdesc"].unique()
+states = dh.get_cdi_field("question")["question"].unique()
+df = dh.get_all_cdi()
+dis_ques = df[df["topic"]=="Disability"]["question"].unique()
+dis_year = df[df["topic"]=="Disability"]["yearstart"].unique()
+diab_ques = df[df["topic"]=="Diabetes"]["question"].unique()
+diab_year = df[df["topic"]=="Diabetes"]["yearstart"].unique()
+states_df = dh.get_cdi_cond(
+        "topic, yearstart, datavaluetype,stratificationcategory1,locationdesc,datavalue,question,locationabbr",
+        'locationdesc',
+        dh.us_states
+        )
 
 app.layout = html.Div([
-    html.H1('Hello Dash'),
-    html.P('Jacob was here'),
-    html.P('Chris was here'),
-    html.P('Alyssa was here'),
-    html.P('Amanda was here'),
-    html.P('Chris was here again'),
+    cdc.explanation_component("introduction.md",header = "Introduction"),
+    cdc.explanation_component("eda_1.md",header = "Question Distribution"),
+    dcc.Dropdown(sorted(questions),style={"width":"150px"},id='state_questions'),
+    html.Div([
+        dcc.Graph(
+            id='questions_plot',
+            style={
+                "width":"100%",
+                "height":"3000px",
+            }
+        ),
+    ],style={
+        "overflowY":"scroll",
+        "height":"500px",
+        "width":"100%"
 
-    html.Div('''
-        Dash: A web application framework for your data. A small change has been made. 
-    '''),
-
+    }),
+    cdc.explanation_component("eda_2.md",header = "Location Distribution"),
+    dcc.Dropdown(sorted(states),style={"width":"1000px"},id='question_drop',value="all"),
     dcc.Graph(
-        id='example-graph',
-        figure=fig
+        id='locale',
+        style={
+            "width":"100%",
+            "height":"70vh",
+        }
     ),
-
-    html.Div('''
-        Dash: Another example for chart
-    '''),
-
     dcc.Graph(
-        id='example-graph2',
-        figure=fig2
-    )
-])
+        id='strat',
+        figure = eda_plots.tree_strat(),
+        style={
+            "width":"100%",
+            "height":"70vh",
+        }
+    ),
+    cdc.explanation_component("eda_3.md",header="Life Expectancy Analysis"),
+    dcc.RadioItems([2018,2019,2020],style={"width":"150px"},id='le_bar_year',value=2019),
+    dcc.Graph(
+        id='le_bar',
+        style={
+            "width":"100%",
+            "height":"70vh",
+        }
+    ),
+    dcc.RadioItems([2018,2019,2020],style={"width":"150px"},id='le_map_year',value=2019),
+    dcc.Graph(
+        id='le_map',
+        style={
+            "width":"100%",
+            "height":"70vh",
+        }
+    ),
+    dcc.RadioItems(dis_year,style={"width":"150px"},id='dis_bar_year',value=2019),
+    dcc.Dropdown(dis_ques,style={"width":"1000px"},id='dis_bar_ques_drop',value="Adults with any disability"),
+    dcc.Graph(
+        id='dis_bar',
+        style={
+            "width":"100%",
+            "height":"70vh",
+        }
+    ),
+    dcc.RadioItems(dis_year,style={"width":"150px"},id='dis_map_year',value=2019),
+    dcc.Dropdown(dis_ques,style={"width":"1000px"},id='dis_map_ques_drop',value="Adults with any disability"),
+    dcc.Graph(
+        id='dis_map',
+        style={
+            "width":"100%",
+            "height":"70vh",
+        }
+    ),
+    dcc.RadioItems(diab_year,style={"width":"150px"},id='diab_bar_year',value=2019),
+    dcc.Dropdown(diab_ques,style={"width":"1000px"},id='diab_bar_ques_drop',value="Diabetes among adults"),
+    dcc.Graph(
+        id='diab_bar',
+        style={
+            "width":"100%",
+            "height":"70vh",
+        }
+    ),
+    dcc.RadioItems(diab_year,style={"width":"150px"},id='diab_map_year',value=2019),
+    dcc.Dropdown(diab_ques,style={"width":"1000px"},id='diab_map_ques_drop',value="Diabetes among adults"),
+    dcc.Graph(
+        id='diab_map',
+        style={
+            "width":"100%",
+            "height":"70vh",
+        }
+    ),
+],
+style={
+    "width":"100vw",
+    "display":"flex",
+    "align-items":"center",
+    "flex-direction":"column",
+    "padding":"0 6em",
+    "box-sizing":'border-box',
+    "background-color":"#1C506C"
+})
 
 if __name__ == '__main__':
     app.run_server(debug=True, port=8080)
