@@ -29,17 +29,25 @@ def location_plot(question=None):
     fig = px.choropleth(data,locationmode="USA-states",scope="usa",locations=data['locationabbr'],color=data['count'])
     return fig
 
-def tree_strat():
-    data = dh.get_cdi_field("topic, question,datavaluetype,stratification1")
+@dash.callback(
+    dash.Output(component_id="strat",component_property="figure"),
+    dash.Input(component_id='topic_drop',component_property="value")
+)
+def tree_strat(topic):
+    data = dh.get_cdi_field("topic, question,datavaluetype,stratification1,datavalue")
+    data = data[data["topic"]==topic]
 
-
-    data = data.groupby(["topic","question","datavaluetype","stratification1"]).size().to_frame("count").reset_index()
-
+    data = data.groupby(["question","datavaluetype","stratification1"],as_index=False).agg(
+        count=pd.NamedAgg(column="datavalue",aggfunc="count"),
+        size=pd.NamedAgg(column="datavalue",aggfunc="size")
+    )
+    data['ratio'] = (data['size']-data['count'])/data['size']
 
     fig = px.sunburst(
         data, 
-        path=["topic","question","datavaluetype","stratification1"],
-        values='count'
+        path=["question","datavaluetype","stratification1"],
+        values='count',
+        color="ratio"
     )
     return fig
 

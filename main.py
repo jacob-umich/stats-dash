@@ -24,6 +24,7 @@ dis_ques = df[df["topic"]=="Disability"]["question"].unique()
 dis_year = df[df["topic"]=="Disability"]["yearstart"].unique()
 diab_ques = df[df["topic"]=="Diabetes"]["question"].unique()
 diab_year = df[df["topic"]=="Diabetes"]["yearstart"].unique()
+topics = df["topic"].unique()
 states_df = dh.get_cdi_cond(
         "topic, yearstart, datavaluetype,stratificationcategory1,locationdesc,datavalue,question,locationabbr",
         'locationdesc',
@@ -57,9 +58,9 @@ app.layout = html.Div([
             "height":"70vh",
         }
     ),
+    dcc.Dropdown(sorted(topics),style={"width":"1000px"},id='topic_drop',value="Diabetes"),
     dcc.Graph(
         id='strat',
-        figure = eda_plots.tree_strat(),
         style={
             "width":"100%",
             "height":"70vh",
