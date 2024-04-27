@@ -2,8 +2,8 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 
-X = test[['sleep', 'smoke', 'obese']]
-y = test['rate']
+X = test[:, :-1]
+y = test[:, -1]
 
 model = LinearRegression()
 model.fit(X, y)
