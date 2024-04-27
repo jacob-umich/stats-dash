@@ -1,16 +1,19 @@
-X_test = test[:, :3]  # Features: sleep, smoke, obese
-y_test = test[:, 3]   # Target variable: rate
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
 
-# Make predictions using the trained model
-y_pred = model.predict(X_test)
+X = test[['sleep', 'smoke', 'obese']]
+y = test['rate']
 
-# Print the first few predictions and actual values
-for i in range(5):
-    print(f"Predicted: {y_pred[i]:.2f}, Actual: {y_test[i]:.2f}")
+model = LinearRegression()
+model.fit(X, y)
 
-# Evaluate the model on the test data
-mse = mean_squared_error(y_test, y_pred)
-r2 = r2_score(y_test, y_pred)
+y_pred = model.predict(X)
 
+mse = mean_squared_error(y, y_pred)
+r2 = r2_score(y, y_pred)
+
+print("Coefficients:", model.coef_)
+print("\nIntercept:", model.intercept_)
 print("\nMean Squared Error:", mse)
 print("R-squared:", r2)
