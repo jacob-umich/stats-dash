@@ -218,5 +218,206 @@ def diab_map(question,year):
 
     return fig
 
+#chris plots:
+
+#le vs. binge drink frequency
+def plot_life_expectancy_alcohol_binge_freq(year):
+    try:
+        # Connect to the SQLite database
+        with sqlite3.connect("health.db") as con:
+            # Query to retrieve aggregated life expectancy data per state from the 'le' table
+            le_query = """
+                SELECT state, AVG(rate) AS avg_rate
+                FROM le
+                GROUP BY state
+            """
+            # Fetch the 'le' data into a DataFrame
+            le_data = pd.read_sql_query(le_query, con)
+            
+            if le_data.empty:
+                print("No data found in the 'le' table.")
+                return
+            
+            # Query to retrieve per capita alcohol consumption data per state from the 'cdi' table
+            cdi_query = f"""
+                SELECT locationdesc AS state, AVG(datavalue) AS avg_datavalue
+                FROM cdi
+                WHERE yearstart={year}
+                AND question='Binge drinking frequency among adults who binge drink'
+                GROUP BY state
+            """
+            # Fetch the 'cdi' data into a DataFrame
+            cdi_data = pd.read_sql_query(cdi_query, con)
+            
+            if cdi_data.empty:
+                print(f"No data found in the 'cdi' table for the year {year} and specified question.")
+                return
+            
+            # Merge the aggregated data from both tables based on the state
+            merged_data = pd.merge(le_data, cdi_data, on='state', how='inner')
+            
+            # Create scatter plot
+            fig = px.scatter(merged_data, x='avg_datavalue', y='avg_rate', color='state',
+                             labels={'avg_datavalue': 'Average Binge Drinking Frequency', 'avg_rate': 'Average Life Expectancy'},
+                             title=f'Average Life Expectancy vs Average Binge Drinking Frequency (Year {year})')
+            
+            # Show the plot
+            fig.show()
+    
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+# Call the function to create and display the scatter plot
+plot_life_expectancy_alcohol_binge_freq(2019)
+
+def plot_life_expectancy_sleep(year):
+    try:
+        # Connect to the SQLite database
+        with sqlite3.connect("health.db") as con:
+            # Query to retrieve aggregated life expectancy data per state from the 'le' table
+            le_query = """
+                SELECT state, AVG(rate) AS avg_rate
+                FROM le
+                GROUP BY state
+            """
+            # Fetch the 'le' data into a DataFrame
+            le_data = pd.read_sql_query(le_query, con)
+            
+            if le_data.empty:
+                print("No data found in the 'le' table.")
+                return
+            
+            # Query to retrieve per capita alcohol consumption data per state from the 'cdi' table
+            cdi_query = f"""
+                SELECT locationdesc AS state, AVG(datavalue) AS avg_datavalue
+                FROM cdi
+                WHERE yearstart={year}
+                AND question='Met aerobic physical activity guideline for substantial health benefits, adults'
+                GROUP BY state
+            """
+            # Fetch the 'cdi' data into a DataFrame
+            cdi_data = pd.read_sql_query(cdi_query, con)
+            
+            if cdi_data.empty:
+                print(f"No data found in the 'cdi' table for the year {year} and specified question.")
+                return
+            
+            # Merge the aggregated data from both tables based on the state
+            merged_data = pd.merge(le_data, cdi_data, on='state', how='inner')
+            
+            # Create scatter plot
+            fig = px.scatter(merged_data, x='avg_datavalue', y='avg_rate', color='state',
+                             labels={'avg_datavalue': 'Physical Activity [%]', 'avg_rate': 'Average Life Expectancy'},
+                             title=f'Average Life Expectancy vs Physical Activity among adults (Year {year})')
+            
+            # Show the plot
+            fig.show()
+    
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+# Call the function to create and display the scatter plot
+plot_life_expectancy_sleep(2019)
+
+#le vs. obesity
+def plot_life_expectancy_obesity(year):
+    try:
+        # Connect to the SQLite database
+        with sqlite3.connect("health.db") as con:
+            # Query to retrieve aggregated life expectancy data per state from the 'le' table
+            le_query = """
+                SELECT state, AVG(rate) AS avg_rate
+                FROM le
+                GROUP BY state
+            """
+            # Fetch the 'le' data into a DataFrame
+            le_data = pd.read_sql_query(le_query, con)
+            
+            if le_data.empty:
+                print("No data found in the 'le' table.")
+                return
+            
+            # Query to retrieve per capita alcohol consumption data per state from the 'cdi' table
+            cdi_query = f"""
+                SELECT locationdesc AS state, AVG(datavalue) AS avg_datavalue
+                FROM cdi
+                WHERE yearstart={year}
+                AND question='Obesity among adults'
+                GROUP BY state
+            """
+            # Fetch the 'cdi' data into a DataFrame
+            cdi_data = pd.read_sql_query(cdi_query, con)
+            
+            if cdi_data.empty:
+                print(f"No data found in the 'cdi' table for the year {year} and specified question.")
+                return
+            
+            # Merge the aggregated data from both tables based on the state
+            merged_data = pd.merge(le_data, cdi_data, on='state', how='inner')
+            
+            # Create scatter plot
+            fig = px.scatter(merged_data, x='avg_datavalue', y='avg_rate', color='state',
+                             labels={'avg_datavalue': 'Obesity', 'avg_rate': 'Average Life Expectancy'},
+                             title=f'Average Life Expectancy vs Obesity among adults (Year {year})')
+            
+            # Show the plot
+            fig.show()
+    
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+# Call the function to create and display the scatter plot
+plot_life_expectancy_obesity(2019)
+
+#le vs. high blood pressure
+def plot_life_expectancy_blood(year):
+    try:
+        # Connect to the SQLite database
+        with sqlite3.connect("health.db") as con:
+            # Query to retrieve aggregated life expectancy data per state from the 'le' table
+            le_query = """
+                SELECT state, AVG(rate) AS avg_rate
+                FROM le
+                GROUP BY state
+            """
+            # Fetch the 'le' data into a DataFrame
+            le_data = pd.read_sql_query(le_query, con)
+            
+            if le_data.empty:
+                print("No data found in the 'le' table.")
+                return
+            
+            # Query to retrieve per capita alcohol consumption data per state from the 'cdi' table
+            cdi_query = f"""
+                SELECT locationdesc AS state, AVG(datavalue) AS avg_datavalue
+                FROM cdi
+                WHERE yearstart={year}
+                AND question='High blood pressure among adults'
+                GROUP BY state
+            """
+            # Fetch the 'cdi' data into a DataFrame
+            cdi_data = pd.read_sql_query(cdi_query, con)
+            
+            if cdi_data.empty:
+                print(f"No data found in the 'cdi' table for the year {year} and specified question.")
+                return
+            
+            # Merge the aggregated data from both tables based on the state
+            merged_data = pd.merge(le_data, cdi_data, on='state', how='inner')
+            
+            # Create scatter plot
+            fig = px.scatter(merged_data, x='avg_datavalue', y='avg_rate', color='state',
+                             labels={'avg_datavalue': 'High blood pressure among adults [%]', 'avg_rate': 'Average Life Expectancy'},
+                             title=f'Average Life Expectancy vs High Blood Pressure among adults (Year {year})')
+            
+            # Show the plot
+            fig.show()
+    
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+# Call the function to create and display the scatter plot
+plot_life_expectancy_blood(2019)
+
 if __name__=="__main__":
     location_plot()
