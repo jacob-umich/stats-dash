@@ -122,13 +122,12 @@ def simple_life(year):
 def obesity(question, year, location):
     conditions = (df['topic'] == 'Nutrition, Physical Activity, and Weight Status') & \
                 (df['locationabbr'] == location) & \
-                (df['yearstart'] == int(year)) & \
                 (df['datavaluetype'] == 'Crude Prevalence') & \
                 (df['stratificationcategory1'] == 'Overall') & \
                 (df['question']==question)
     data = df.loc[conditions, ['yearstart', 'datavalue']]
     return data
 
-def obesity_rates(question, year):
-    return obesity(question, year, 'US')
+def obesity_rates(question):
+    return obesity(question, 'US')
 
