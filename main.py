@@ -122,8 +122,8 @@ app.layout = html.Div([
             "height":"70vh",
         }
     ),
+    cdc.explanation_component("sdoh_conclusion.md",header = "Trends Loosely Seen Here"),
     dcc.Dropdown(questions,style={"width":"1000px"},id='obesity_line_state_drop',value="Alabama"),
-    cdc.explanation_component("sdoh_conclusion.md",header = "Social Determinant Trends Hold True"),
     dcc.Graph(
         id='obesity_line',
         style={
