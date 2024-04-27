@@ -7,6 +7,7 @@ import custom_dash_component as cdc
 import eda_plots
 import pandas as pd
 import data_handler as dh
+import predict_engine
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__,external_stylesheets=external_stylesheets)
@@ -133,11 +134,7 @@ app.layout = html.Div([
             "height":"70vh",
         }
     ),
-<<<<<<< HEAD
     cdc.explanation_component("sdoh_conclusion.md",header = "Social Determinant Trends Hold True"),
-=======
-    cdc.explanation_component("sdoh_conclusion.md",header = "Trends Loosely Seen Here"),
->>>>>>> eda
     cdc.explanation_component("eda_n.md",header = "Life Expectancy Predictors"),
     dcc.Graph(
         id='life_sleep',
@@ -147,15 +144,15 @@ app.layout = html.Div([
             "height":"70vh",
         }
     ),
-    cdc.explanation_component("eda_n.md",header = "machine learning prediction"),
-    html.Label('percentage of population that is obese'),
+    cdc.explanation_component("ml.md",header = "Machine Learning Prediction"),
+    html.Label('percentage of population that is obese',style={"color":"#DBF7EC"}),
     dcc.Input(value=50, type='number',id="ml_ob"),
-    html.Label('percentage of population that smokes'),
+    html.Label('percentage of population that smokes',style={"color":"#DBF7EC"}),
     dcc.Input(value=50, type='number',id="ml_smoke"),
-    html.Label('percentage of population that doesn\'t get enough sleep'),
+    html.Label('percentage of population that doesn\'t get enough sleep',style={"color":"#DBF7EC"}),
     dcc.Input(value=50, type='number',id="ml_sleep"),
-    html.P("The life expectancy for your population is:"),
-    html.P(id="ml_predict")
+    html.P("The life expectancy for your population is:",style={"color":"#DBF7EC"}),
+    html.Div(id="ml_predict",style={"color":"#DBF7EC"})
 ],
 style={
     "width":"100vw",

@@ -13,5 +13,7 @@ with open('model.pkl','rb') as f:
     dash.Input(component_id='ml_sleep',component_property="value")
 )
 def predict(obesity,sleep,smoke):
-    x = np.array([obesity,smoke,sleep])
-    return model.predict(x)
+    x = np.array([[obesity,smoke,sleep]])
+    y =  model.predict(x)
+    print(y)
+    return f"{y[0]}"
