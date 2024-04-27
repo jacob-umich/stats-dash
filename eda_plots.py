@@ -3,17 +3,18 @@ import dash
 import data_handler as dh
 from SHOD_cleaning_data import us_states
 import pandas as pd
-
+import sqlite3
 @dash.callback(
     dash.Output(component_id="questions_plot",component_property="figure"),
     dash.Input(component_id='state_questions',component_property="value")
 )
 def question_plot(state=None):
-    cdi_questions = dh.get_cdi_field("question,locationdesc")
+    cdi_questions = dh.get_cdi_field("question,locationdesc,yearstart")
     if state:
         cdi_questions = cdi_questions[cdi_questions["locationdesc"]==state]
-    cdi_questions=cdi_questions.groupby("question").size().to_frame("count").reset_index().sort_values("count",axis=0)
-    fig = px.bar(cdi_questions, x="count",y="question", orientation="h")
+    cdi_questions=cdi_questions.groupby(["question","yearstart"],as_index=False).agg(
+        count=pd.NamedAgg(column="question",aggfunc="count")).sort_values("count",axis=0)
+    fig = px.bar(cdi_questions, x="count",y="question", orientation="h",color="yearstart")
     return fig
 
 @dash.callback(
@@ -41,8 +42,9 @@ def tree_strat(topic):
         count=pd.NamedAgg(column="datavalue",aggfunc="count"),
         size=pd.NamedAgg(column="datavalue",aggfunc="size")
     )
-    data['ratio'] = (data['size']-data['count'])/data['size']
 
+    data['ratio'] = (data['size']-data['count'])/data['size']
+    data.drop(data.loc[data['count']==0].index,inplace=True)
     fig = px.sunburst(
         data, 
         path=["question","datavaluetype","stratification1"],
@@ -218,6 +220,26 @@ def diab_map(question,year):
 
     return fig
 
+
+def coorelation():
+    data = dh.df
+    sleep_data = data[
+        (data["question"]=="Short sleep duration among adults") &
+        (data["datavaluetype"]=="Crude Prevalence") &
+        (data["stratification1"]=="Overall")
+        ]
+    sleep_data = sleep_data.rename({"datavalue":"sleep"},axis=1)
+    smoke_data = data[
+        (data["question"]=="Current cigarette smoking among adults") &
+        (data["datavaluetype"]=="Crude Prevalence") &
+        (data["stratification1"]=="Overall")
+        ]
+    smoke_data = smoke_data.rename({"datavalue":"smoke"},axis=1)
+    life_data = dh.get_all_le()
+    merged = pd.merge(life_data,smoke_data,left_on=["state","year"],right_on=["locationabbr","yearstart"])
+    merged = pd.merge(merged,sleep_data,left_on=["state","year"],right_on=["locationabbr","yearstart"])
+    fig = px.scatter_matrix(merged, dimensions=['sleep','smoke','rate'],color="year")
+    return fig
 #chris plots (5 scatter plots):
 
 #le vs. binge drink freq.
@@ -262,7 +284,7 @@ def plot_life_expectancy_alcohol_binge_freq(year):
                              title=f'Average Life Expectancy vs Average Binge Drinking Frequency (Year {year})')
             
             # Show the plot
-            fig.show()
+            # fig.show()
     
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -312,7 +334,7 @@ def plot_life_expectancy_alc(year):
                              title=f'Average Life Expectancy vs per capita alcohol consumption (Year {year})')
             
             # Show the plot
-            fig.show()
+            # fig.show()
     
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -362,7 +384,7 @@ def plot_life_expectancy_smoke(year):
                              title=f'Average Life Expectancy vs % of Adults who smoke (Year {year})')
             
             # Show the plot
-            fig.show()
+            # fig.show()
     
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -412,7 +434,7 @@ def plot_life_expectancy_obesity(year):
                              title=f'Average Life Expectancy vs Obesity among adults (Year {year})')
             
             # Show the plot
-            fig.show()
+            # fig.show()
     
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -462,7 +484,7 @@ def plot_life_expectancy_stress(year):
                              title=f'Average Life Expectancy vs % of Adults in Distress (Year {year})')
             
             # Show the plot
-            fig.show()
+            # fig.show()
     
     except Exception as e:
         print(f"An error occurred: {e}")

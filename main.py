@@ -119,6 +119,14 @@ app.layout = html.Div([
             "height":"70vh",
         }
     ),
+    dcc.Graph(
+        id='life_sleep',
+        figure = eda_plots.coorelation(),
+        style={
+            "width":"100%",
+            "height":"70vh",
+        }
+    ),
 ],
 style={
     "width":"100vw",

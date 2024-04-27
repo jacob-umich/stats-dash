@@ -57,17 +57,15 @@ def get_cdi_cond(features,field,accepted_values):
     if cdi is None:
         return cdi
     else:
-        print("start")
         with db.connect("health.db") as con:
             cdi = pd.read_sql_query(f"select {features} from cdi", con)
         cdi = cdi[cdi[field].isin(accepted_values)]
         cache.cache_data("get_cdi_cond",{"features":features,"field":field,"accepted_values":accepted_values},cdi)
-        print("stop")
         return cdi
 
 # loading this df once since it takes a while
 df = get_cdi_cond(
-    "topic, yearstart, datavaluetype,stratificationcategory1,locationdesc,datavalue,question,locationabbr",
+    "topic, yearstart, datavaluetype,stratificationcategory1,locationdesc,datavalue,question,locationabbr,stratification1",
     'locationdesc',
     us_states
     )
@@ -118,4 +116,11 @@ def simple_life(year):
         life_data = pd.read_sql_query(f"select rate,state from le where year={year}",con)
         life_data['state'] = life_data['state'].map({v: k for k, v in state_mapping.items()})
     return life_data
+
+def get_all_le():
+    with db.connect("health.db") as con:
+        life_data = pd.read_sql_query(f"select rate,state,year from le",con)
+        life_data['state'] = life_data['state'].map({v: k for k, v in state_mapping.items()})
+    return life_data
+
 
