@@ -4,6 +4,7 @@ import data_handler as dh
 from SHOD_cleaning_data import us_states
 import pandas as pd
 import sqlite3
+
 @dash.callback(
     dash.Output(component_id="questions_plot",component_property="figure"),
     dash.Input(component_id='state_questions',component_property="value")

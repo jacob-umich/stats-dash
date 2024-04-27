@@ -140,6 +140,15 @@ app.layout = html.Div([
             "height":"70vh",
         }
     ),
+    cdc.explanation_component("eda_n.md",header = "machine learning prediction"),
+    html.Label('percentage of population that is obese'),
+    dcc.Input(value=50, type='number',id="ml_ob"),
+    html.Label('percentage of population that smokes'),
+    dcc.Input(value=50, type='number',id="ml_smoke"),
+    html.Label('percentage of population that doesn\'t get enough sleep'),
+    dcc.Input(value=50, type='number',id="ml_sleep"),
+    html.P("The life expectancy for your population is:"),
+    html.P(id="ml_predict")
 ],
 style={
     "width":"100vw",
