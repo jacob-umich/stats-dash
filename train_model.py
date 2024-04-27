@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import sklearn as sk
 from sklearn.model_selection import cross_val_score
+from sklearn.tree import DecisionTreeRegressor
+import pickle
 
 dt_params = [
     {
@@ -29,26 +31,7 @@ svd_params = [
     },
 ]
 
-def hyper_tune(data):
-    results = {}
-    for i,param in dt_params:
-        model = train_dt_model(data,param)
-        score = cross_val_score(model,data[:,0:-1],data[:,-1:],cv=10)
-        results[f"dt_{i}"]=score.mean()
 
-    model = train_lr_model(data)
-    score = cross_val_score(model,data[:,0:-1],data[:,-1:],cv=10)
-    results["linear_regression"] = score.mean()
-
-    for i,param in svd_params:
-        model = train_svd_model(data,param)
-        score = cross_val_score(model,data[:,0:-1],data[:,-1:],cv=10)
-        results[f"svd_{i}"]=score.mean()
-
-    results = pd.Series(results)
-    
-    with open("text_scripts/hyper_tuning.md","w") as f:
-        results.to_markdown(f)
 
 
 def get_data():
@@ -86,24 +69,53 @@ def get_data():
     test = data[int(n_data*0.8):,:]
     return train,test
 
-# linear regression model
-X = test[:, :-1]
-y = test[:, -1]
+def get_linear(data):
+    # linear regression model
+    x = data[:, :-1]
+    y = data[:, -1:]
 
-model = LinearRegression()
-model.fit(X, y)
+    model = sk.linear_model.LinearRegression()
+    model.fit(x, y)
 
-y_pred = model.predict(X)
+    return model
 
-mse = mean_squared_error(y, y_pred)
-r2 = r2_score(y, y_pred)
+def train_dt(training, max_leaf_nodes=None, max_depth=None, min_samples_split=2, random_state=None):
+    X_train = training[:, :-1]  # assuming the last column is the target
+    y_train = training[:, -1]
 
-# evaluating linear regression model
-print("Coefficients:", model.coef_)
-print("\nIntercept:", model.intercept_)
-print("\nMean Squared Error:", mse)
-print("R-squared:", r2)
+    model = DecisionTreeRegressor(
+        max_leaf_nodes=max_leaf_nodes, 
+        max_depth=max_depth,
+        min_samples_split=min_samples_split,
+        random_state=random_state
+    )
+
+    model.fit(X_train, y_train)
+    return model
+
+def hyper_tune(data):
+    results = {}
+    for i,param in dt_params:
+        model = train_dt(data,param)
+        score = cross_val_score(model,data[:,0:-1],data[:,-1:],cv=10)
+        results[f"dt_{i}"]=score.mean()
+
+    model = get_linear(data)
+    score = cross_val_score(model,data[:,0:-1],data[:,-1:],cv=10)
+    results["linear_regression"] = score.mean()
+
+    for i,param in svd_params:
+        model = train_svd_model(data,param)
+        score = cross_val_score(model,data[:,0:-1],data[:,-1:],cv=10)
+        results[f"svd_{i}"]=score.mean()
+
+    results = pd.Series(results)
+
+    with open("text_scripts/hyper_tuning.md","w") as f:
+        results.to_markdown(f)
 
 if __name__=="__main__":
     train,test = get_data()
-    # print(train)
+    model = train_dt(train)
+    with open("model.pkl","wb") as f:
+        pickle.dump(model,f)

@@ -137,3 +137,42 @@ def obesity(location):
     data = df.loc[conditions, ['yearstart', 'datavalue']]
     return data
 
+#dh to combine le and cdi tables
+def cdi_le(topic, locationabbr, question, yearstart):
+    # Retrieve data from the 'cdi' table
+    cdi_query = f"""
+        SELECT topic, locationabbr, question, yearstart, datavalue
+        FROM cdi
+        WHERE topic = '{topic}'
+        AND locationabbr = '{locationabbr}'
+        AND question = '{question}'
+        AND yearstart = {yearstart}
+    """
+    cdi_data = pd.read_sql_query(cdi_query, conn)
+    
+    # Retrieve data from the 'le' table
+    le_query = f"""
+        SELECT year, state, rate
+        FROM le
+        WHERE year = {yearstart}
+        AND state = '{locationabbr}'
+    """
+    le_data = pd.read_sql_query(le_query, conn)
+    
+    # Merge the two dataframes on the common columns
+    merged_data = pd.merge(cdi_data, le_data, left_on=['yearstart', 'locationabbr'], right_on=['year', 'state'])
+    
+    return merged_data
+
+def alcohol(question, location):
+    conditions = (cdi_le['topic'] == 'Alcohol') & \
+                (cdi_le['datavaluetype'] == 'Per capita alcohol consumption gallons') & \
+                (cdi_le['stratificationcategory1'] == 'Overall') & \
+                (cdi_le['question']==question)
+    data = cdi_le.loc[conditions, ['yearstart', 'datavalue']]
+    return data
+
+#alc. rates function
+def alcohol_rates(question):
+    return alcohol(question, state_mapping)
+

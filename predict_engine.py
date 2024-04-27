@@ -2,7 +2,7 @@ import pickle
 import dash
 import numpy as np
 
-with open('model','rb') as f:
+with open('model.pkl','rb') as f:
     model = pickle.load(f)
 
 
