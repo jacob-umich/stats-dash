@@ -86,6 +86,7 @@ app.layout = html.Div([
         }
     ),
     cdc.explanation_component("sdoh_intro.md",header = "Trends Seen in Social Determinants of Health"),
+    cdc.explanation_component("diability.md",header = "Comparison of Disability Prevalence")
     dcc.RadioItems(dis_year,style={"width":"150px"},id='dis_bar_year',value=2019),
     dcc.Dropdown(dis_ques,style={"width":"1000px"},id='dis_bar_ques_drop',value="Adults with any disability"),
     dcc.Graph(
@@ -104,6 +105,7 @@ app.layout = html.Div([
             "height":"70vh",
         }
     ),
+    cdc.explanation_component("diabetes.md",header = "Comparison of Diabetes Prevalence")
     dcc.RadioItems(diab_year,style={"width":"150px"},id='diab_bar_year',value=2019),
     dcc.Dropdown(diab_ques,style={"width":"1000px"},id='diab_bar_ques_drop',value="Diabetes among adults"),
     dcc.Graph(
