@@ -1,6 +1,7 @@
 import data_handler as dh
 import pandas as pd
 import numpy as np
+import sklearn as sk
 
 def get_data():
     data = dh.df

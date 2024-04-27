@@ -123,7 +123,6 @@ app.layout = html.Div([
         }
     ),
     dcc.Dropdown(questions,style={"width":"1000px"},id='obesity_line_state_drop',value="Alabama"),
-    cdc.explanation_component("sdoh_conclusion.md",header = "Social Determinant Trends Hold True"),
     dcc.Graph(
         id='obesity_line',
         style={
@@ -131,6 +130,7 @@ app.layout = html.Div([
             "height":"70vh",
         }
     ),
+    cdc.explanation_component("sdoh_conclusion.md",header = "Social Determinant Trends Hold True"),
     cdc.explanation_component("eda_n.md",header = "Life Expectancy Predictors"),
     dcc.Graph(
         id='life_sleep',
