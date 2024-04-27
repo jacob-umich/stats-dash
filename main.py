@@ -24,6 +24,8 @@ dis_ques = df[df["topic"]=="Disability"]["question"].unique()
 dis_year = df[df["topic"]=="Disability"]["yearstart"].unique()
 diab_ques = df[df["topic"]=="Diabetes"]["question"].unique()
 diab_year = df[df["topic"]=="Diabetes"]["yearstart"].unique()
+obes_quest = df[df["topic"]=="Nutrition, Physical Activity, and Weight Status"]["question"].unique()
+topics = df["topic"].unique()
 states_df = dh.get_cdi_cond(
         "topic, yearstart, datavaluetype,stratificationcategory1,locationdesc,datavalue,question,locationabbr",
         'locationdesc',
@@ -33,6 +35,7 @@ states_df = dh.get_cdi_cond(
 app.layout = html.Div([
     cdc.explanation_component("introduction.md",header = "Introduction"),
     cdc.explanation_component("eda_1.md",header = "Question Distribution"),
+    
     dcc.Dropdown(sorted(questions),style={"width":"150px"},id='state_questions'),
     html.Div([
         dcc.Graph(
@@ -57,9 +60,9 @@ app.layout = html.Div([
             "height":"70vh",
         }
     ),
+    dcc.Dropdown(sorted(topics),style={"width":"1000px"},id='topic_drop',value="Diabetes"),
     dcc.Graph(
         id='strat',
-        figure = eda_plots.tree_strat(),
         style={
             "width":"100%",
             "height":"70vh",
@@ -82,6 +85,7 @@ app.layout = html.Div([
             "height":"70vh",
         }
     ),
+    cdc.explanation_component("sdoh_intro.md",header = "Trends Seen in Social Determinants of Health"),
     dcc.RadioItems(dis_year,style={"width":"150px"},id='dis_bar_year',value=2019),
     dcc.Dropdown(dis_ques,style={"width":"1000px"},id='dis_bar_ques_drop',value="Adults with any disability"),
     dcc.Graph(
@@ -113,6 +117,24 @@ app.layout = html.Div([
     dcc.Dropdown(diab_ques,style={"width":"1000px"},id='diab_map_ques_drop',value="Diabetes among adults"),
     dcc.Graph(
         id='diab_map',
+        style={
+            "width":"100%",
+            "height":"70vh",
+        }
+    ),
+    dcc.Dropdown(questions,style={"width":"1000px"},id='obesity_line_state_drop',value="Alabama"),
+    cdc.explanation_component("sdoh_conclusion.md",header = "Social Determinant Trends Hold True"),
+    dcc.Graph(
+        id='obesity_line',
+        style={
+            "width":"100%",
+            "height":"70vh",
+        }
+    ),
+    cdc.explanation_component("eda_n.md",header = "Life Expectancy Predictors"),
+    dcc.Graph(
+        id='life_sleep',
+        figure = eda_plots.coorelation(),
         style={
             "width":"100%",
             "height":"70vh",
