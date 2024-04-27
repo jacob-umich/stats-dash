@@ -470,6 +470,22 @@ def plot_life_expectancy_stress(year):
 # Call the function to create and display the scatter plot
 plot_life_expectancy_stress(2019)
 
+@dash.callback(
+    dash.Output(component_id="obesity_line",component_property="figure"),
+    [dash.Input(component_id='obesity_line_ques_drop',component_property="value"),
+    dash.Input(component_id='obesity_line_year',component_property="value")]
+)
+
+def obesity_line(question, year):
+  obesity_rates = dh.obesity_rates(question,year)
+  fig = px.line(obesity_rates, x='yearstart', y='datavalue', title='Obesity Rates Among Adults in the US',
+              markers=True, line_shape='linear')
+  fig.update_traces(mode='markers+lines')
+  fig.update_layout(title_x=0.5)
+  fig.update_xaxes(type='category', title='Year')
+  fig.update_yaxes(title='Percent of Obese Adults')
+  return fig
+
 
 if __name__=="__main__":
     location_plot()
