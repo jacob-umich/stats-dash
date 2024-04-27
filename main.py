@@ -24,6 +24,7 @@ dis_ques = df[df["topic"]=="Disability"]["question"].unique()
 dis_year = df[df["topic"]=="Disability"]["yearstart"].unique()
 diab_ques = df[df["topic"]=="Diabetes"]["question"].unique()
 diab_year = df[df["topic"]=="Diabetes"]["yearstart"].unique()
+obes_quest = df[df["topic"]=="Nutrition, Physical Activity, and Weight Status"]["question"].unique()
 topics = df["topic"].unique()
 states_df = dh.get_cdi_cond(
         "topic, yearstart, datavaluetype,stratificationcategory1,locationdesc,datavalue,question,locationabbr",
@@ -114,6 +115,14 @@ app.layout = html.Div([
     dcc.Dropdown(diab_ques,style={"width":"1000px"},id='diab_map_ques_drop',value="Diabetes among adults"),
     dcc.Graph(
         id='diab_map',
+        style={
+            "width":"100%",
+            "height":"70vh",
+        }
+    ),
+    dcc.Dropdown(obes_quest,style={"width":"1000px"},id='obesity_line_ques_drop',value=""),
+    dcc.Graph(
+        id='obesity_line',
         style={
             "width":"100%",
             "height":"70vh",

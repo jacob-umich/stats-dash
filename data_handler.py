@@ -123,4 +123,14 @@ def get_all_le():
         life_data['state'] = life_data['state'].map({v: k for k, v in state_mapping.items()})
     return life_data
 
+def obesity(question, location):
+    conditions = (df['topic'] == 'Nutrition, Physical Activity, and Weight Status') & \
+                (df['datavaluetype'] == 'Crude Prevalence') & \
+                (df['stratificationcategory1'] == 'Overall') & \
+                (df['question']==question)
+    data = df.loc[conditions, ['yearstart', 'datavalue']]
+    return data
+
+def obesity_rates(question):
+    return obesity(question, 'US')
 
