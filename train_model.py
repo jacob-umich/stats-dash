@@ -38,6 +38,24 @@ def get_data():
     test = data[int(n_data*0.8):,:]
     return train,test
 
+# linear regression model
+X = test[:, :-1]
+y = test[:, -1]
+
+model = LinearRegression()
+model.fit(X, y)
+
+y_pred = model.predict(X)
+
+mse = mean_squared_error(y, y_pred)
+r2 = r2_score(y, y_pred)
+
+# evaluating linear regression model
+print("Coefficients:", model.coef_)
+print("\nIntercept:", model.intercept_)
+print("\nMean Squared Error:", mse)
+print("R-squared:", r2)
+
 if __name__=="__main__":
     train,test = get_data()
     # print(train)
