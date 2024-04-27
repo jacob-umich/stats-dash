@@ -235,10 +235,17 @@ def coorelation():
         (data["stratification1"]=="Overall")
         ]
     smoke_data = smoke_data.rename({"datavalue":"smoke"},axis=1)
+    obesity_data = data[
+        (data["question"]=="Obesity among adults") &
+        (data["datavaluetype"]=="Crude Prevalence") &
+        (data["stratification1"]=="Overall")
+        ]
+    obesity_data = obesity_data.rename({"datavalue":"obese"},axis=1)
     life_data = dh.get_all_le()
     merged = pd.merge(life_data,smoke_data,left_on=["state","year"],right_on=["locationabbr","yearstart"])
-    merged = pd.merge(merged,sleep_data,left_on=["state","year"],right_on=["locationabbr","yearstart"])
-    fig = px.scatter_matrix(merged, dimensions=['sleep','smoke','rate'],color="year")
+    merged = pd.merge(merged,sleep_data,how="left",left_on=["state","year"],right_on=["locationabbr","yearstart"])
+    merged = pd.merge(merged,obesity_data,how="left",left_on=["state","year"],right_on=["locationabbr","yearstart"])
+    fig = px.scatter_matrix(merged, dimensions=['obese','sleep','smoke','rate'],color="year")
     return fig
 #chris plots (5 scatter plots):
 
@@ -494,15 +501,15 @@ plot_life_expectancy_stress(2019)
 
 @dash.callback(
     dash.Output(component_id="obesity_line",component_property="figure"),
-    dash.Input(component_id='obesity_line_ques_drop',component_property="value")
+    dash.Input(component_id='obesity_line_state_drop',component_property="value")
 )
-def obesity_line(question):
-    obesity_rates = dh.obesity_rates(question)
+def obesity_line(location):
+    obesity_rates = dh.obesity(location)
     fig = px.line(
         obesity_rates, 
         x='yearstart', 
         y='datavalue', 
-        title='Obesity Rates Among Adults in the US',
+        title=f'Obesity Rates Among Adults in {location}',
         # markers=True, 
         line_shape='linear'
     )

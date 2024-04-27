@@ -1,0 +1,1 @@
+we can see there are strong coorelations between several of these disease indicators and life expectancy if we plot them. Unfortunately, the years the data was collected do not match up perfectly. The life expectancy data ranges from 2018 to 2020, and the chronic disease data ranges from 2019 and on.

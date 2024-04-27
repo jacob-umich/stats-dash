@@ -35,6 +35,7 @@ states_df = dh.get_cdi_cond(
 app.layout = html.Div([
     cdc.explanation_component("introduction.md",header = "Introduction"),
     cdc.explanation_component("eda_1.md",header = "Question Distribution"),
+    
     dcc.Dropdown(sorted(questions),style={"width":"150px"},id='state_questions'),
     html.Div([
         dcc.Graph(
@@ -120,7 +121,7 @@ app.layout = html.Div([
             "height":"70vh",
         }
     ),
-    dcc.Dropdown(obes_quest,style={"width":"1000px"},id='obesity_line_ques_drop',value=""),
+    dcc.Dropdown(questions,style={"width":"1000px"},id='obesity_line_state_drop',value="Alabama"),
     dcc.Graph(
         id='obesity_line',
         style={
@@ -128,6 +129,7 @@ app.layout = html.Div([
             "height":"70vh",
         }
     ),
+    cdc.explanation_component("eda_n.md",header = "Life Expectancy Predictors"),
     dcc.Graph(
         id='life_sleep',
         figure = eda_plots.coorelation(),
