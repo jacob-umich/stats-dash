@@ -218,9 +218,9 @@ def diab_map(question,year):
 
     return fig
 
-#chris plots:
+#chris plots (5 scatter plots):
 
-#le vs. binge drink frequency
+#le vs. binge drink freq.
 def plot_life_expectancy_alcohol_binge_freq(year):
     try:
         # Connect to the SQLite database
@@ -270,7 +270,8 @@ def plot_life_expectancy_alcohol_binge_freq(year):
 # Call the function to create and display the scatter plot
 plot_life_expectancy_alcohol_binge_freq(2019)
 
-def plot_life_expectancy_sleep(year):
+#le vs. per capital alc consumption
+def plot_life_expectancy_alc(year):
     try:
         # Connect to the SQLite database
         with sqlite3.connect("health.db") as con:
@@ -287,12 +288,12 @@ def plot_life_expectancy_sleep(year):
                 print("No data found in the 'le' table.")
                 return
             
-            # Query to retrieve per capita alcohol consumption data per state from the 'cdi' table
+            # Query to retrieve frequent mental distress among adults per state from the 'cdi' table
             cdi_query = f"""
                 SELECT locationdesc AS state, AVG(datavalue) AS avg_datavalue
                 FROM cdi
                 WHERE yearstart={year}
-                AND question='Met aerobic physical activity guideline for substantial health benefits, adults'
+                AND question='Per capita alcohol consumption among people aged 14 years and older'
                 GROUP BY state
             """
             # Fetch the 'cdi' data into a DataFrame
@@ -307,8 +308,8 @@ def plot_life_expectancy_sleep(year):
             
             # Create scatter plot
             fig = px.scatter(merged_data, x='avg_datavalue', y='avg_rate', color='state',
-                             labels={'avg_datavalue': 'Physical Activity [%]', 'avg_rate': 'Average Life Expectancy'},
-                             title=f'Average Life Expectancy vs Physical Activity among adults (Year {year})')
+                             labels={'avg_datavalue': 'Per capita alcohol consumption [gallons]', 'avg_rate': 'Average Life Expectancy'},
+                             title=f'Average Life Expectancy vs per capita alcohol consumption (Year {year})')
             
             # Show the plot
             fig.show()
@@ -317,9 +318,59 @@ def plot_life_expectancy_sleep(year):
         print(f"An error occurred: {e}")
 
 # Call the function to create and display the scatter plot
-plot_life_expectancy_sleep(2019)
+plot_life_expectancy_alc(2019)
 
-#le vs. obesity
+#le vs. % of adults who smoke
+def plot_life_expectancy_smoke(year):
+    try:
+        # Connect to the SQLite database
+        with sqlite3.connect("health.db") as con:
+            # Query to retrieve aggregated life expectancy data per state from the 'le' table
+            le_query = """
+                SELECT state, AVG(rate) AS avg_rate
+                FROM le
+                GROUP BY state
+            """
+            # Fetch the 'le' data into a DataFrame
+            le_data = pd.read_sql_query(le_query, con)
+            
+            if le_data.empty:
+                print("No data found in the 'le' table.")
+                return
+            
+            # Query to retrieve % who smoke for each state from the 'cdi' table
+            cdi_query = f"""
+                SELECT locationdesc AS state, AVG(datavalue) AS avg_datavalue
+                FROM cdi
+                WHERE yearstart={year}
+                AND question='Current cigarette smoking among adults'
+                GROUP BY state
+            """
+            # Fetch the 'cdi' data into a DataFrame
+            cdi_data = pd.read_sql_query(cdi_query, con)
+            
+            if cdi_data.empty:
+                print(f"No data found in the 'cdi' table for the year {year} and specified question.")
+                return
+            
+            # Merge the aggregated data from both tables based on the state
+            merged_data = pd.merge(le_data, cdi_data, on='state', how='inner')
+            
+            # Create scatter plot
+            fig = px.scatter(merged_data, x='avg_datavalue', y='avg_rate', color='state',
+                             labels={'avg_datavalue': 'Adults who smoke [%]', 'avg_rate': 'Average Life Expectancy'},
+                             title=f'Average Life Expectancy vs % of Adults who smoke (Year {year})')
+            
+            # Show the plot
+            fig.show()
+    
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+# Call the function to create and display the scatter plot
+plot_life_expectancy_smoke(2019)
+
+#le vs. obesity % in adults
 def plot_life_expectancy_obesity(year):
     try:
         # Connect to the SQLite database
@@ -357,7 +408,7 @@ def plot_life_expectancy_obesity(year):
             
             # Create scatter plot
             fig = px.scatter(merged_data, x='avg_datavalue', y='avg_rate', color='state',
-                             labels={'avg_datavalue': 'Obesity', 'avg_rate': 'Average Life Expectancy'},
+                             labels={'avg_datavalue': 'Obesity [%]', 'avg_rate': 'Average Life Expectancy'},
                              title=f'Average Life Expectancy vs Obesity among adults (Year {year})')
             
             # Show the plot
@@ -369,8 +420,8 @@ def plot_life_expectancy_obesity(year):
 # Call the function to create and display the scatter plot
 plot_life_expectancy_obesity(2019)
 
-#le vs. high blood pressure
-def plot_life_expectancy_blood(year):
+#le vs. %  distressed
+def plot_life_expectancy_stress(year):
     try:
         # Connect to the SQLite database
         with sqlite3.connect("health.db") as con:
@@ -387,12 +438,12 @@ def plot_life_expectancy_blood(year):
                 print("No data found in the 'le' table.")
                 return
             
-            # Query to retrieve per capita alcohol consumption data per state from the 'cdi' table
+            # Query to retrieve frequent mental distress among adults per state from the 'cdi' table
             cdi_query = f"""
                 SELECT locationdesc AS state, AVG(datavalue) AS avg_datavalue
                 FROM cdi
                 WHERE yearstart={year}
-                AND question='High blood pressure among adults'
+                AND question='Frequent mental distress among adults'
                 GROUP BY state
             """
             # Fetch the 'cdi' data into a DataFrame
@@ -407,8 +458,8 @@ def plot_life_expectancy_blood(year):
             
             # Create scatter plot
             fig = px.scatter(merged_data, x='avg_datavalue', y='avg_rate', color='state',
-                             labels={'avg_datavalue': 'High blood pressure among adults [%]', 'avg_rate': 'Average Life Expectancy'},
-                             title=f'Average Life Expectancy vs High Blood Pressure among adults (Year {year})')
+                             labels={'avg_datavalue': 'Adults who are distressed [%]', 'avg_rate': 'Average Life Expectancy'},
+                             title=f'Average Life Expectancy vs % of Adults in Distress (Year {year})')
             
             # Show the plot
             fig.show()
@@ -417,7 +468,8 @@ def plot_life_expectancy_blood(year):
         print(f"An error occurred: {e}")
 
 # Call the function to create and display the scatter plot
-plot_life_expectancy_blood(2019)
+plot_life_expectancy_stress(2019)
+
 
 if __name__=="__main__":
     location_plot()
