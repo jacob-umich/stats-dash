@@ -119,9 +119,10 @@ def simple_life(year):
         life_data['state'] = life_data['state'].map({v: k for k, v in state_mapping.items()})
     return life_data
 
-def obesity(question, location):
+def obesity(question, year, location):
     conditions = (df['topic'] == 'Nutrition, Physical Activity, and Weight Status') & \
                 (df['locationabbr'] == location) & \
+                (df['yearstart'] == int(year)) & \
                 (df['datavaluetype'] == 'Crude Prevalence') & \
                 (df['stratificationcategory1'] == 'Overall') & \
                 (df['question']==question)
