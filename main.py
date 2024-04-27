@@ -85,6 +85,7 @@ app.layout = html.Div([
             "height":"70vh",
         }
     ),
+    cdc.explanation_component("sdoh_intro.md",header = "Trends Seen in Social Determinants of Health"),
     dcc.RadioItems(dis_year,style={"width":"150px"},id='dis_bar_year',value=2019),
     dcc.Dropdown(dis_ques,style={"width":"1000px"},id='dis_bar_ques_drop',value="Adults with any disability"),
     dcc.Graph(
@@ -122,6 +123,7 @@ app.layout = html.Div([
         }
     ),
     dcc.Dropdown(questions,style={"width":"1000px"},id='obesity_line_state_drop',value="Alabama"),
+    cdc.explanation_component("sdoh_conclusion.md",header = "Social Determinant Trends Hold True"),
     dcc.Graph(
         id='obesity_line',
         style={
