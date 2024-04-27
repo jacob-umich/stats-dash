@@ -67,14 +67,14 @@ def life_expectancy_plot(year):
     fig = px.bar(
         combined_data, y='state', x='rate', color='Group', barmode='group',
         labels={'state': 'State', 'rate': 'Life Expectancy'},
-        title='Top 5 and Bottom 5 States for Life Expectancy in 2019',
+        title='Top 5 and Bottom 5 States for Life Expectancy',
         color_discrete_map={'Lowest Life Expectancy': 'red', 'Highest Life Expectancy': 'green'}
     )
     fig.update_yaxes(categoryorder='total ascending')
     fig.update_traces(marker_line_width=1.5, marker_line_color='black')
     fig.update_xaxes(range=[70, 81], dtick=4)
     fig.update_layout(
-        title='<b>2019 Life Expectancy: Best and Worst States</b>')
+        title='<b>Life Expectancy: Best and Worst States</b>')
     fig.update_layout(title_x=0.5, title_font=dict(size=20, family='Arial', color='black'))
     fig.update_layout(
         legend=dict(
@@ -100,7 +100,7 @@ def life_expectancy_map(year):
         color='rate',
         scope='usa',
         color_continuous_scale='Viridis',
-        title='2019 Life Expectancy by State'
+        title='Life Expectancy by State'
     )
 
     fig.update_layout(title_x=0.5)
@@ -154,7 +154,7 @@ def dis_map(question,year):
         color='datavalue',
         scope='usa',
         color_continuous_scale='Inferno',
-        title='2019 Precent of U.S. Adults with Any Disability'
+        title='Precent of U.S. Adults with Any Disability'
     )
 
     fig.update_layout(title_x=0.5)
