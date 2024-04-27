@@ -131,6 +131,15 @@ def obesity(question, location):
     data = df.loc[conditions, ['yearstart', 'datavalue']]
     return data
 
+def get_simple(question,year):
+  conditions = (df['Topic'] == 'Diabetes') & \
+              (df['YearStart'] == int(year)) & \
+              (df['Question'] == question) & \
+              (df['DataValueType'] == 'Crude Prevalence') & \
+              (df['StratificationCategory1'] == 'Overall')
+  diabetes_simple = df.loc[conditions, ['LocationAbbr','DataValue']]
+  return diabetes_simple
+
 def obesity_rates(question):
     return obesity(question, 'US')
 
