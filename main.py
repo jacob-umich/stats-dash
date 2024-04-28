@@ -34,7 +34,7 @@ states_df = dh.get_cdi_cond(
         )
 
 app.layout = html.Div([
-    cdc.explanation_component("introduction.md",header = "Introduction"),
+    cdc.explanation_component("introduction.md",header = "Chronic Disease Indicators"),
     cdc.explanation_component("eda_1.md",header = "Question Distribution"),
     
     dcc.Dropdown(sorted(questions),style={"width":"150px"},id='state_questions'),
@@ -61,6 +61,7 @@ app.layout = html.Div([
             "height":"70vh",
         }
     ),
+    cdc.explanation_component("eda_4.md",header="Presence and Types of Data"),
     dcc.Dropdown(sorted(topics),style={"width":"1000px"},id='topic_drop',value="Diabetes"),
     dcc.Graph(
         id='strat',
