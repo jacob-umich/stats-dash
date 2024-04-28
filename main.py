@@ -56,11 +56,11 @@ app.layout = html.Div([
             id='questions_plot',
             style={
                 "width":"100%",
-                "height":"3000px",
+                "height":"100%",
             }
         ),
     ],style={
-        "overflowY":"scroll",
+        "overflowX":"scroll",
         "height":"500px",
         "width":"100%"
 
