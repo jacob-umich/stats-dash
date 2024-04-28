@@ -520,9 +520,14 @@ def obesity_line(location):
     fig.update_xaxes(type='category', title='Year')
     fig.update_yaxes(title='Percent of Obese Adults')
     return fig
+    
+@dash.callback(
+    dash.Output(component_id="diabetes_hist",component_property="figure"),
+    dash.Input(component_id='diabetes_hist_year',component_property="value")
+)
 
 def diabetes_hist(question,year):
-    filter_df = dh.diabetes_simple('Diabetes among adults',2019)
+    filter_df = dh.diabetes_simple('Diabetes among adults',year)
     fig = px.histogram(
     filter_df,
     x = 'DataValue', 
