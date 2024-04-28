@@ -534,11 +534,18 @@ def obesity_line(location):
 #     fig.update_layout(xaxis_title='% of Adults', yaxis_title='Count')
 #     return fig
 
-# def alcohol_scatter(question,year):
-#     fig = px.scatter(merged_data, x='avg_datavalue', y='avg_rate', color='state',
-#                              labels={'avg_datavalue': 'Per capita alcohol consumption', 'avg_rate': 'Average Life Expectancy'},
-#                              title=f'Average Life Expectancy vs per capita alcohol consumption (Year {year})')
-#     return fig
+def alcohol_scatter(question,year):
+    alc_rates = dh.alcohol_rates
+    fig = px.scatter(alc_rates, x='avg_datavalue', y='avg_rate', color='state',
+    labels={'avg_datavalue': 'Per capita alcohol consumption', 'avg_rate': 'Average Life Expectancy'},
+    title=f'Average Life Expectancy vs per capita alcohol consumption (Year {year})')
+    return fig
+
+def alcohol_binge_scatter(question,year):
+    fig = px.scatter(merged_data, x='avg_datavalue', y='avg_rate', color='state',
+    labels={'avg_datavalue': 'Per capita alcohol consumption', 'avg_rate': 'Average Life Expectancy'},
+    title=f'Average Life Expectancy vs per capita alcohol consumption (Year {year})')
+    return fig
 
 if __name__=="__main__":
     location_plot()
