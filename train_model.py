@@ -70,7 +70,7 @@ def get_data():
     test = data[int(n_data*0.8):,:]
     return train,test
 
-def get_linear(data):
+def train_regression(data):
     # linear regression model
     x = data[:, :-1]
     y = data[:, -1:]
@@ -139,3 +139,9 @@ if __name__=="__main__":
     model = train_svm(train)
     with open("model.pkl","wb") as f:
         pickle.dump(model,f)
+
+if __name__ == "__main__":
+    train, test = get_data()
+    model = train_regression(train)
+    results = model.predict(test[:, :-1])
+    print(results)
