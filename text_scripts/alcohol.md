@@ -1,0 +1,1 @@
+Alcohol usage was analyzed in terms of its contribution to life expectancy. Surprisingly, there's not much of a trend in binge drinking frequency among adults or in per capita consumption with life expectancy. This is likely due to a lot of other factors contributing to life expectancy. Also, many people may not be honest when it comes to how much alcohol they consume. 

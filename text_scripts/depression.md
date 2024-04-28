@@ -1,0 +1,1 @@
+Depression was also analyzed as a factor contributing to life expectancy. In states with higher rates of depression, there are lower life expectancies. Frequent mental distress among adults shows an even stronger correlation, with high rates of distress contributing to lower life expectancies. 
