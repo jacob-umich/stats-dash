@@ -5,6 +5,7 @@ import sklearn as sk
 from sklearn.model_selection import cross_val_score
 from sklearn.tree import DecisionTreeRegressor
 import pickle
+from sklearn.svm import SVR
 
 dt_params = [
     {
@@ -69,7 +70,7 @@ def get_data():
     test = data[int(n_data*0.8):,:]
     return train,test
 
-def get_linear(data):
+def train_regression(data):
     # linear regression model
     x = data[:, :-1]
     y = data[:, -1:]
@@ -114,8 +115,33 @@ def hyper_tune(data):
     with open("text_scripts/hyper_tuning.md","w") as f:
         results.to_markdown(f)
 
+def train_svm(training, kernel='rbf', C=1.0, epsilon=0.1):
+    # Extract features and target variable from training data
+    X_train = training[:, :-1]
+    y_train = training[:, -1]
+    
+    # Initialize SVM model
+    svm_model = SVR(kernel=kernel, C=C, epsilon=epsilon)
+    
+    # Train the SVM model
+    svm_model.fit(X_train, y_train)
+    
+    return svm_model
+
 if __name__=="__main__":
     train,test = get_data()
     model = train_dt(train)
     with open("model.pkl","wb") as f:
         pickle.dump(model,f)
+
+if __name__=="__main__":
+    train,test = get_data()
+    model = train_svm(train)
+    with open("model.pkl","wb") as f:
+        pickle.dump(model,f)
+
+if __name__ == "__main__":
+    train, test = get_data()
+    model = train_regression(train)
+    results = model.predict(test[:, :-1])
+    print(results)
