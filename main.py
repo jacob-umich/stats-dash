@@ -125,6 +125,15 @@ app.layout = html.Div([
             "height":"70vh",
         }
     ),
+    dcc.RadioItems(diab_year,style={"width":"150px"},id='diab_bar_year',value=2019),
+    dcc.Dropdown(diab_ques,style={"width":"1000px"},id='diab_bar_ques_drop',value="Diabetes among adults"),
+    dcc.Graph(
+        id='diabetes_hist',
+        style={
+            "width":"100%",
+            "height":"70vh",
+        }
+    ),
     cdc.explanation_component("obesity.md",header = "Obesity"),
     dcc.Dropdown(questions,style={"width":"1000px"},id='obesity_line_state_drop',value="Alabama"),
     dcc.Graph(
