@@ -7,6 +7,7 @@ import custom_dash_component as cdc
 import eda_plots
 import pandas as pd
 import data_handler as dh
+import predict_engine
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__,external_stylesheets=external_stylesheets)
@@ -86,7 +87,7 @@ app.layout = html.Div([
         }
     ),
     cdc.explanation_component("sdoh_intro.md",header = "Trends Seen in Social Determinants of Health"),
-    cdc.explanation_component("diability.md",header = "Comparison of Disability Prevalence")
+    cdc.explanation_component("disability.md",header = "Comparison of Disability Prevalence"),
     dcc.RadioItems(dis_year,style={"width":"150px"},id='dis_bar_year',value=2019),
     dcc.Dropdown(dis_ques,style={"width":"1000px"},id='dis_bar_ques_drop',value="Adults with any disability"),
     dcc.Graph(
@@ -105,7 +106,7 @@ app.layout = html.Div([
             "height":"70vh",
         }
     ),
-    cdc.explanation_component("diabetes.md",header = "Comparison of Diabetes Prevalence")
+    cdc.explanation_component("diabetes.md",header = "Comparison of Diabetes Prevalence"),
     dcc.RadioItems(diab_year,style={"width":"150px"},id='diab_bar_year',value=2019),
     dcc.Dropdown(diab_ques,style={"width":"1000px"},id='diab_bar_ques_drop',value="Diabetes among adults"),
     dcc.Graph(
@@ -124,7 +125,7 @@ app.layout = html.Div([
             "height":"70vh",
         }
     ),
-    cdc.explanation_component("sdoh_conclusion.md",header = "Trends Loosely Seen Here"),
+    cdc.explanation_component("obesity.md",header = "Obesity"),
     dcc.Dropdown(questions,style={"width":"1000px"},id='obesity_line_state_drop',value="Alabama"),
     dcc.Graph(
         id='obesity_line',
@@ -143,6 +144,15 @@ app.layout = html.Div([
             "height":"70vh",
         }
     ),
+    cdc.explanation_component("ml.md",header = "Machine Learning Prediction"),
+    html.Label('percentage of population that is obese',style={"color":"#DBF7EC"}),
+    dcc.Input(value=50, type='number',id="ml_ob"),
+    html.Label('percentage of population that smokes',style={"color":"#DBF7EC"}),
+    dcc.Input(value=50, type='number',id="ml_smoke"),
+    html.Label('percentage of population that doesn\'t get enough sleep',style={"color":"#DBF7EC"}),
+    dcc.Input(value=50, type='number',id="ml_sleep"),
+    html.P("The life expectancy for your population is:",style={"color":"#DBF7EC"}),
+    html.Div(id="ml_predict",style={"color":"#DBF7EC"})
 ],
 style={
     "width":"100vw",

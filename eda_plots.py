@@ -4,6 +4,7 @@ import data_handler as dh
 from SHOD_cleaning_data import us_states
 import pandas as pd
 import sqlite3
+
 @dash.callback(
     dash.Output(component_id="questions_plot",component_property="figure"),
     dash.Input(component_id='state_questions',component_property="value")
@@ -504,6 +505,7 @@ plot_life_expectancy_stress(2019)
     dash.Input(component_id='obesity_line_state_drop',component_property="value")
 )
 def obesity_line(location):
+    print(location)
     obesity_rates = dh.obesity(location)
     fig = px.line(
         obesity_rates, 
@@ -519,24 +521,24 @@ def obesity_line(location):
     fig.update_yaxes(title='Percent of Obese Adults')
     return fig
 
-def diabetes_hist(question,year):
-    filter_df = dh.diabetes_simple('Diabetes among adults',2019)
-    fig = px.histogram(
-      filter_df,
-      x = 'DataValue', 
-      nbins = 5,
-      title = 'Distribution of Adults with Diabetes',
-  )
-    fig.update_layout(title_x=0.5)
-    fig.update_layout(coloraxis_colorbar_title_text='Distribution of Adults with Diabetes')
-    fig.update_layout(xaxis_title='% of Adults', yaxis_title='Count')
-    return fig
+# def diabetes_hist(question,year):
+#     filter_df = dh.diabetes_simple('Diabetes among adults',2019)
+#     fig = px.histogram(
+#       filter_df,
+#       x = 'DataValue', 
+#       nbins = 5,
+#       title = 'Distribution of Adults with Diabetes',
+#   )
+#     fig.update_layout(title_x=0.5)
+#     fig.update_layout(coloraxis_colorbar_title_text='Distribution of Adults with Diabetes')
+#     fig.update_layout(xaxis_title='% of Adults', yaxis_title='Count')
+#     return fig
 
-def alcohol_scatter(question,year):
-    fig = px.scatter(merged_data, x='avg_datavalue', y='avg_rate', color='state',
-                             labels={'avg_datavalue': 'Per capita alcohol consumption', 'avg_rate': 'Average Life Expectancy'},
-                             title=f'Average Life Expectancy vs per capita alcohol consumption (Year {year})')
-    return fig
+# def alcohol_scatter(question,year):
+#     fig = px.scatter(merged_data, x='avg_datavalue', y='avg_rate', color='state',
+#                              labels={'avg_datavalue': 'Per capita alcohol consumption', 'avg_rate': 'Average Life Expectancy'},
+#                              title=f'Average Life Expectancy vs per capita alcohol consumption (Year {year})')
+#     return fig
 
 if __name__=="__main__":
     location_plot()

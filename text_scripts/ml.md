@@ -1,0 +1,1 @@
+we can use machine learning to predict the life expectancy of a population based on their health statistics

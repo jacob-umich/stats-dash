@@ -128,16 +128,14 @@ def get_all_le():
         life_data['state'] = life_data['state'].map({v: k for k, v in state_mapping.items()})
     return life_data
 
-def obesity(question, location):
+def obesity(location):
     conditions = (df['topic'] == 'Nutrition, Physical Activity, and Weight Status') & \
                 (df['datavaluetype'] == 'Crude Prevalence') & \
                 (df['stratificationcategory1'] == 'Overall') & \
-                (df['question']==question)
+                (df['question']=="Obesity among adults") &\
+                (df['locationdesc']==location)
     data = df.loc[conditions, ['yearstart', 'datavalue']]
     return data
-
-def obesity_rates(question):
-    return obesity(question, 'US')
 
 #dh to combine le and cdi tables
 def cdi_le(topic, locationabbr, question, yearstart):
