@@ -1,0 +1,3 @@
+Here are a few scatter plots illustrating how alcohol use impacts life expectancy. As expected, lower alcohol use correlates positvely with a higher life expectancy. 
+The first chart shows the Per capita alcohol consumption of adults, in terms of gallons consumed per year. 
+The second chart shows binge drinking frequency among adults. Lower binge drinking rates correlate positively to higher life expectancies.
