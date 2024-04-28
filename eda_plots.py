@@ -521,18 +521,18 @@ def obesity_line(location):
     fig.update_yaxes(title='Percent of Obese Adults')
     return fig
 
-# def diabetes_hist(question,year):
-#     filter_df = dh.diabetes_simple('Diabetes among adults',2019)
-#     fig = px.histogram(
-#       filter_df,
-#       x = 'DataValue', 
-#       nbins = 5,
-#       title = 'Distribution of Adults with Diabetes',
-#   )
-#     fig.update_layout(title_x=0.5)
-#     fig.update_layout(coloraxis_colorbar_title_text='Distribution of Adults with Diabetes')
-#     fig.update_layout(xaxis_title='% of Adults', yaxis_title='Count')
-#     return fig
+def diabetes_hist(question,year):
+    filter_df = dh.diabetes_simple('Diabetes among adults',2019)
+    fig = px.histogram(
+    filter_df,
+    x = 'DataValue', 
+    nbins = 5,
+    title = 'Distribution of Adults with Diabetes',
+    )
+    fig.update_layout(title_x=0.5)
+    fig.update_layout(coloraxis_colorbar_title_text='Distribution of Adults with Diabetes')
+    fig.update_layout(xaxis_title='% of Adults', yaxis_title='Count')
+    return fig
 
 # def alcohol_scatter(question,year):
 #     fig = px.scatter(merged_data, x='avg_datavalue', y='avg_rate', color='state',
