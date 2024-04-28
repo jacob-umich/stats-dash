@@ -1,0 +1,1 @@
+The affect of smoking on life expectancy was also analyzed. There is a very strong trend between smoking and life expectancy, with higher rates of smoking leading to lower life expectancies. Also, states that have comprehensive smoke-free policies indoors have higher life expectancies.

@@ -158,7 +158,7 @@ app.layout = html.Div([
     ),
     cdc.explanation_component("sdoh_conclusion.md",header = "Social Determinant Trends Hold True"),
 
-    cdc.explanation_component("alcohol.md",header = "Alcohol"),
+    cdc.explanation_component("alcohol.md",header = "Alcohol Consumption"),
     dcc.Dropdown(alc_ques,style={"width":"1000px"},id='alc_scat_qeust',value="Binge drinking intensity among adults who binge drink"),
     dcc.Dropdown(alc_year,style={"width":"1000px"},id='alc_scat_year',value=2019),
     dcc.Dropdown(alc_metric,style={"width":"1000px"},id='alc_scat_metric',value="Crude Median"),
@@ -169,6 +169,7 @@ app.layout = html.Div([
             "height":"70vh",
         }
     ),
+    cdc.explanation_component("smoke.md",header = "Smoking"),
     dcc.Dropdown(smoke_ques,style={"width":"1000px"},id='smoke_scat_qeust',value="Quit attempts in the past year among adult current smokers"),
     dcc.Dropdown(smoke_year,style={"width":"1000px"},id='smoke_scat_year',value=2019),
     dcc.Dropdown(smoke_metric,style={"width":"1000px"},id='smoke_scat_metric',value="Crude Prevalence"),
@@ -179,6 +180,7 @@ app.layout = html.Div([
             "height":"70vh",
         }
     ),
+    cdc.explanation_component("depression.md",header = "Mental Health"),
     dcc.Dropdown(stress_ques,style={"width":"1000px"},id='stress_scat_qeust',value="Depression among adults"),
     dcc.Dropdown(stress_year,style={"width":"1000px"},id='stress_scat_year',value=2019),
     dcc.Dropdown(stress_metric,style={"width":"1000px"},id='stress_scat_metric',value="Crude Prevalence"),
