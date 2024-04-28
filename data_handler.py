@@ -138,41 +138,54 @@ def obesity(location):
     return data
 
 #dh to combine le and cdi tables
-def cdi_le(topic, locationabbr, question, yearstart):
+def cdi_le(topic, question, yearstart):
     # Retrieve data from the 'cdi' table
-    cdi_query = f"""
-        SELECT topic, locationabbr, question, yearstart, datavalue
-        FROM cdi
-        WHERE topic = '{topic}'
-        AND locationabbr = '{locationabbr}'
-        AND question = '{question}'
-        AND yearstart = {yearstart}
-    """
-    cdi_data = pd.read_sql_query(cdi_query, conn)
-    
-    # Retrieve data from the 'le' table
-    le_query = f"""
-        SELECT year, state, rate
-        FROM le
-        WHERE year = {yearstart}
-        AND state = '{locationabbr}'
-    """
-    le_data = pd.read_sql_query(le_query, conn)
+    with db.connect("health.db") as con:
+        cdi_query = f"""
+            SELECT topic, locationdesc, question, yearstart, datavalue ,stratification1,datavaluetype
+            FROM cdi
+            WHERE topic = '{topic}'
+            AND question = '{question}'
+            AND yearstart = {yearstart}
+        """
+        cdi_data = pd.read_sql_query(cdi_query, con)
+        
+        # Retrieve data from the 'le' table
+        le_query = f"""
+            SELECT year, state, rate
+            FROM le
+            WHERE year = {yearstart}
+        """
+        le_data = pd.read_sql_query(le_query, con)
     
     # Merge the two dataframes on the common columns
-    merged_data = pd.merge(cdi_data, le_data, left_on=['yearstart', 'locationabbr'], right_on=['year', 'state'])
+    merged_data = pd.merge(cdi_data, le_data,how="right",left_on=['yearstart', 'locationdesc'], right_on=['year', 'state'])
     
     return merged_data
 
-def alcohol(question, location):
-    conditions = (cdi_le['topic'] == 'Alcohol') & \
-                (cdi_le['datavaluetype'] == 'Per capita alcohol consumption gallons') & \
-                (cdi_le['stratificationcategory1'] == 'Overall') & \
-                (cdi_le['question']==question)
-    data = cdi_le.loc[conditions, ['yearstart', 'datavalue']]
+def alcohol(question,year,metric):
+    data = cdi_le('Alcohol',question,year)
+    conditions =(data['stratification1'] == 'Overall') & \
+                (data['datavaluetype'] == metric)
+    data = data.loc[conditions, ['yearstart', 'datavalue','locationdesc','rate']]
+    data = data[data['locationdesc'].isin(us_states)][["yearstart","datavalue","rate",'locationdesc']]
     return data
 
-#alc. rates function
-def alcohol_rates(question):
-    return alcohol(question, state_mapping)
+def smoking(question,year,metric):
+    data = cdi_le('Tobacco',question,year)
+    conditions =(data['stratification1'] == 'Overall') & \
+                (data['datavaluetype'] == metric)
+    data = data.loc[conditions, ['yearstart', 'datavalue','locationdesc','rate']]
+    data = data[data['locationdesc'].isin(us_states)][["yearstart","datavalue","rate",'locationdesc']]
+    return data
+
+def stress(question,year,metric):
+    data = cdi_le('Mental Health',question,year)
+    conditions =(data['stratification1'] == 'Overall') & \
+                (data['datavaluetype'] == metric)
+    data = data.loc[conditions, ['yearstart', 'datavalue','locationdesc','rate']]
+    data = data[data['locationdesc'].isin(us_states)][["yearstart","datavalue","rate",'locationdesc']]
+    return data
+
+
 

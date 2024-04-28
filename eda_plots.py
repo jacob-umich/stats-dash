@@ -4,6 +4,7 @@ import data_handler as dh
 from SHOD_cleaning_data import us_states
 import pandas as pd
 import sqlite3
+import textwrap
 
 @dash.callback(
     dash.Output(component_id="questions_plot",component_property="figure"),
@@ -15,7 +16,14 @@ def question_plot(state=None):
         cdi_questions = cdi_questions[cdi_questions["locationdesc"]==state]
     cdi_questions=cdi_questions.groupby(["question","yearstart"],as_index=False).agg(
         count=pd.NamedAgg(column="question",aggfunc="count")).sort_values("count",axis=0)
-    fig = px.bar(cdi_questions, x="count",y="question", orientation="h",color="yearstart")
+    qs = [f"q{i}" for i in range(len(cdi_questions['question'].unique()))]
+    fig = px.bar(cdi_questions, y="count",x="question",hover_name="question", orientation="v",color="yearstart",barmode="relative")
+    fig.update_layout(
+        title='<b>Number of data entries for each question</b>',
+        xaxis_title="Question (hover for question)",
+        yaxis_title="Number of entries in database"
+    )
+    fig.update_xaxes(showticklabels=False)
     return fig
 
 @dash.callback(
@@ -29,6 +37,9 @@ def location_plot(question=None):
     data = data[data['locationdesc'].isin(us_states)]
     data = data.groupby("locationabbr").size().to_frame("count").reset_index()
     fig = px.choropleth(data,locationmode="USA-states",scope="usa",locations=data['locationabbr'],color=data['count'])
+    fig.update_layout(
+        title='<b>Number of data entries for each question per state</b>',
+    )
     return fig
 
 @dash.callback(
@@ -44,13 +55,21 @@ def tree_strat(topic):
         size=pd.NamedAgg(column="datavalue",aggfunc="size")
     )
 
+    def customwrap(s,width=30):
+        return "<br>".join(textwrap.wrap(s,width=width))
+
     data['ratio'] = (data['size']-data['count'])/data['size']
     data.drop(data.loc[data['count']==0].index,inplace=True)
+    data["question"]=data["question"].map(customwrap)
+    data["datavaluetype"]=data["datavaluetype"].map(customwrap)
     fig = px.sunburst(
         data, 
         path=["question","datavaluetype","stratification1"],
         values='count',
         color="ratio"
+    )
+    fig.update_layout(
+        title='<b>Tree structure of chronic disease indicator dataset</b>',
     )
     return fig
 
@@ -202,6 +221,7 @@ def diab_bar(question, year):
     dash.Input(component_id='diab_map_ques_drop',component_property="value"),
     dash.Input(component_id='diab_map_year',component_property="value")
 )
+
 def diab_map(question,year):
 
     diabetes_simple = dh.diabetes_simple(question,year)
@@ -246,259 +266,23 @@ def coorelation():
     merged = pd.merge(life_data,smoke_data,left_on=["state","year"],right_on=["locationabbr","yearstart"])
     merged = pd.merge(merged,sleep_data,how="left",left_on=["state","year"],right_on=["locationabbr","yearstart"])
     merged = pd.merge(merged,obesity_data,how="left",left_on=["state","year"],right_on=["locationabbr","yearstart"])
-    fig = px.scatter_matrix(merged, dimensions=['obese','sleep','smoke','rate'],color="year")
+    fig = px.scatter_matrix(
+        merged, 
+        dimensions=['obese','sleep','smoke','rate'],
+        color="year",
+        color_continuous_scale='Viridis',
+        labels={
+            "obese":"%  obese",
+            "sleep":"%  sleep deprived",
+            "smoke":"%  that smokes",
+            "rate":"Life expectancy",
+        }
+    )
+    fig.update_layout(
+        title='<b>Correlation between CDI variables and life expectancy</b>'
+    )
     return fig
 #chris plots (5 scatter plots):
-
-#le vs. binge drink freq.
-def plot_life_expectancy_alcohol_binge_freq(year):
-    try:
-        # Connect to the SQLite database
-        with sqlite3.connect("health.db") as con:
-            # Query to retrieve aggregated life expectancy data per state from the 'le' table
-            le_query = """
-                SELECT state, AVG(rate) AS avg_rate
-                FROM le
-                GROUP BY state
-            """
-            # Fetch the 'le' data into a DataFrame
-            le_data = pd.read_sql_query(le_query, con)
-            
-            if le_data.empty:
-                print("No data found in the 'le' table.")
-                return
-            
-            # Query to retrieve per capita alcohol consumption data per state from the 'cdi' table
-            cdi_query = f"""
-                SELECT locationdesc AS state, AVG(datavalue) AS avg_datavalue
-                FROM cdi
-                WHERE yearstart={year}
-                AND question='Binge drinking frequency among adults who binge drink'
-                GROUP BY state
-            """
-            # Fetch the 'cdi' data into a DataFrame
-            cdi_data = pd.read_sql_query(cdi_query, con)
-            
-            if cdi_data.empty:
-                print(f"No data found in the 'cdi' table for the year {year} and specified question.")
-                return
-            
-            # Merge the aggregated data from both tables based on the state
-            merged_data = pd.merge(le_data, cdi_data, on='state', how='inner')
-            
-            # Create scatter plot
-            fig = px.scatter(merged_data, x='avg_datavalue', y='avg_rate', color='state',
-                             labels={'avg_datavalue': 'Average Binge Drinking Frequency', 'avg_rate': 'Average Life Expectancy'},
-                             title=f'Average Life Expectancy vs Average Binge Drinking Frequency (Year {year})')
-            
-            # Show the plot
-            # fig.show()
-    
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-# Call the function to create and display the scatter plot
-plot_life_expectancy_alcohol_binge_freq(2019)
-
-#le vs. per capital alc consumption
-def plot_life_expectancy_alc(year):
-    try:
-        # Connect to the SQLite database
-        with sqlite3.connect("health.db") as con:
-            # Query to retrieve aggregated life expectancy data per state from the 'le' table
-            le_query = """
-                SELECT state, AVG(rate) AS avg_rate
-                FROM le
-                GROUP BY state
-            """
-            # Fetch the 'le' data into a DataFrame
-            le_data = pd.read_sql_query(le_query, con)
-            
-            if le_data.empty:
-                print("No data found in the 'le' table.")
-                return
-            
-            # Query to retrieve frequent mental distress among adults per state from the 'cdi' table
-            cdi_query = f"""
-                SELECT locationdesc AS state, AVG(datavalue) AS avg_datavalue
-                FROM cdi
-                WHERE yearstart={year}
-                AND question='Per capita alcohol consumption among people aged 14 years and older'
-                GROUP BY state
-            """
-            # Fetch the 'cdi' data into a DataFrame
-            cdi_data = pd.read_sql_query(cdi_query, con)
-            
-            if cdi_data.empty:
-                print(f"No data found in the 'cdi' table for the year {year} and specified question.")
-                return
-            
-            # Merge the aggregated data from both tables based on the state
-            merged_data = pd.merge(le_data, cdi_data, on='state', how='inner')
-            
-            # Create scatter plot
-            fig = px.scatter(merged_data, x='avg_datavalue', y='avg_rate', color='state',
-                             labels={'avg_datavalue': 'Per capita alcohol consumption [gallons]', 'avg_rate': 'Average Life Expectancy'},
-                             title=f'Average Life Expectancy vs per capita alcohol consumption (Year {year})')
-            
-            # Show the plot
-            # fig.show()
-    
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-# Call the function to create and display the scatter plot
-plot_life_expectancy_alc(2019)
-
-#le vs. % of adults who smoke
-def plot_life_expectancy_smoke(year):
-    try:
-        # Connect to the SQLite database
-        with sqlite3.connect("health.db") as con:
-            # Query to retrieve aggregated life expectancy data per state from the 'le' table
-            le_query = """
-                SELECT state, AVG(rate) AS avg_rate
-                FROM le
-                GROUP BY state
-            """
-            # Fetch the 'le' data into a DataFrame
-            le_data = pd.read_sql_query(le_query, con)
-            
-            if le_data.empty:
-                print("No data found in the 'le' table.")
-                return
-            
-            # Query to retrieve % who smoke for each state from the 'cdi' table
-            cdi_query = f"""
-                SELECT locationdesc AS state, AVG(datavalue) AS avg_datavalue
-                FROM cdi
-                WHERE yearstart={year}
-                AND question='Current cigarette smoking among adults'
-                GROUP BY state
-            """
-            # Fetch the 'cdi' data into a DataFrame
-            cdi_data = pd.read_sql_query(cdi_query, con)
-            
-            if cdi_data.empty:
-                print(f"No data found in the 'cdi' table for the year {year} and specified question.")
-                return
-            
-            # Merge the aggregated data from both tables based on the state
-            merged_data = pd.merge(le_data, cdi_data, on='state', how='inner')
-            
-            # Create scatter plot
-            fig = px.scatter(merged_data, x='avg_datavalue', y='avg_rate', color='state',
-                             labels={'avg_datavalue': 'Adults who smoke [%]', 'avg_rate': 'Average Life Expectancy'},
-                             title=f'Average Life Expectancy vs % of Adults who smoke (Year {year})')
-            
-            # Show the plot
-            # fig.show()
-    
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-# Call the function to create and display the scatter plot
-plot_life_expectancy_smoke(2019)
-
-#le vs. obesity % in adults
-def plot_life_expectancy_obesity(year):
-    try:
-        # Connect to the SQLite database
-        with sqlite3.connect("health.db") as con:
-            # Query to retrieve aggregated life expectancy data per state from the 'le' table
-            le_query = """
-                SELECT state, AVG(rate) AS avg_rate
-                FROM le
-                GROUP BY state
-            """
-            # Fetch the 'le' data into a DataFrame
-            le_data = pd.read_sql_query(le_query, con)
-            
-            if le_data.empty:
-                print("No data found in the 'le' table.")
-                return
-            
-            # Query to retrieve per capita alcohol consumption data per state from the 'cdi' table
-            cdi_query = f"""
-                SELECT locationdesc AS state, AVG(datavalue) AS avg_datavalue
-                FROM cdi
-                WHERE yearstart={year}
-                AND question='Obesity among adults'
-                GROUP BY state
-            """
-            # Fetch the 'cdi' data into a DataFrame
-            cdi_data = pd.read_sql_query(cdi_query, con)
-            
-            if cdi_data.empty:
-                print(f"No data found in the 'cdi' table for the year {year} and specified question.")
-                return
-            
-            # Merge the aggregated data from both tables based on the state
-            merged_data = pd.merge(le_data, cdi_data, on='state', how='inner')
-            
-            # Create scatter plot
-            fig = px.scatter(merged_data, x='avg_datavalue', y='avg_rate', color='state',
-                             labels={'avg_datavalue': 'Obesity [%]', 'avg_rate': 'Average Life Expectancy'},
-                             title=f'Average Life Expectancy vs Obesity among adults (Year {year})')
-            
-            # Show the plot
-            # fig.show()
-    
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-# Call the function to create and display the scatter plot
-plot_life_expectancy_obesity(2019)
-
-#le vs. %  distressed
-def plot_life_expectancy_stress(year):
-    try:
-        # Connect to the SQLite database
-        with sqlite3.connect("health.db") as con:
-            # Query to retrieve aggregated life expectancy data per state from the 'le' table
-            le_query = """
-                SELECT state, AVG(rate) AS avg_rate
-                FROM le
-                GROUP BY state
-            """
-            # Fetch the 'le' data into a DataFrame
-            le_data = pd.read_sql_query(le_query, con)
-            
-            if le_data.empty:
-                print("No data found in the 'le' table.")
-                return
-            
-            # Query to retrieve frequent mental distress among adults per state from the 'cdi' table
-            cdi_query = f"""
-                SELECT locationdesc AS state, AVG(datavalue) AS avg_datavalue
-                FROM cdi
-                WHERE yearstart={year}
-                AND question='Frequent mental distress among adults'
-                GROUP BY state
-            """
-            # Fetch the 'cdi' data into a DataFrame
-            cdi_data = pd.read_sql_query(cdi_query, con)
-            
-            if cdi_data.empty:
-                print(f"No data found in the 'cdi' table for the year {year} and specified question.")
-                return
-            
-            # Merge the aggregated data from both tables based on the state
-            merged_data = pd.merge(le_data, cdi_data, on='state', how='inner')
-            
-            # Create scatter plot
-            fig = px.scatter(merged_data, x='avg_datavalue', y='avg_rate', color='state',
-                             labels={'avg_datavalue': 'Adults who are distressed [%]', 'avg_rate': 'Average Life Expectancy'},
-                             title=f'Average Life Expectancy vs % of Adults in Distress (Year {year})')
-            
-            # Show the plot
-            # fig.show()
-    
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-# Call the function to create and display the scatter plot
-plot_life_expectancy_stress(2019)
 
 @dash.callback(
     dash.Output(component_id="obesity_line",component_property="figure"),
@@ -520,25 +304,71 @@ def obesity_line(location):
     fig.update_xaxes(type='category', title='Year')
     fig.update_yaxes(title='Percent of Obese Adults')
     return fig
+    
+@dash.callback(
+    dash.Output(component_id="diabetes_hist",component_property="figure"),
+    dash.Input(component_id='diabetes_hist_year',component_property="value")
+)
+def diabetes_hist(year):
+    filter_df = dh.diabetes_simple('Diabetes among adults',year)
+    fig = px.histogram(
+    filter_df,
+    x = 'datavalue', 
+    nbins = 5,
+    title = 'Distribution of Adults with Diabetes',
+    )
+    fig.update_layout(title_x=0.5)
+    fig.update_layout(coloraxis_colorbar_title_text='Distribution of Adults with Diabetes')
+    fig.update_layout(xaxis_title='% of Adults', yaxis_title='Count')
+    return fig
 
-# def diabetes_hist(question,year):
-#     filter_df = dh.diabetes_simple('Diabetes among adults',2019)
-#     fig = px.histogram(
-#       filter_df,
-#       x = 'DataValue', 
-#       nbins = 5,
-#       title = 'Distribution of Adults with Diabetes',
-#   )
-#     fig.update_layout(title_x=0.5)
-#     fig.update_layout(coloraxis_colorbar_title_text='Distribution of Adults with Diabetes')
-#     fig.update_layout(xaxis_title='% of Adults', yaxis_title='Count')
-#     return fig
+#le vs. binge drink freq.
+@dash.callback(
+    dash.Output(component_id="alc_scat",component_property="figure"),
+    dash.Input(component_id='alc_scat_qeust',component_property="value"),
+    dash.Input(component_id='alc_scat_year',component_property="value"),
+    dash.Input(component_id='alc_scat_metric',component_property="value")
+)
+def plot_life_expectancy_alcohol_binge_freqq(question,year,metric):
+    merged_data = dh.alcohol(question, year,metric)
+        
+        # Create scatter plot
+    fig = px.scatter(merged_data, x='datavalue', y='rate', color='locationdesc',
+                        labels={'avg_datavalue': 'Average Binge Drinking Frequency', 'avg_rate': 'Average Life Expectancy'},
+                        title=f'Life Expectancy vs Binge Drinking Frequency (Year {year})')
+    return fig
+    
 
-# def alcohol_scatter(question,year):
-#     fig = px.scatter(merged_data, x='avg_datavalue', y='avg_rate', color='state',
-#                              labels={'avg_datavalue': 'Per capita alcohol consumption', 'avg_rate': 'Average Life Expectancy'},
-#                              title=f'Average Life Expectancy vs per capita alcohol consumption (Year {year})')
-#     return fig
+@dash.callback(
+    dash.Output(component_id="smoke_scat",component_property="figure"),
+    dash.Input(component_id='smoke_scat_qeust',component_property="value"),
+    dash.Input(component_id='smoke_scat_year',component_property="value"),
+    dash.Input(component_id='smoke_scat_metric',component_property="value")
+)
+def smoking_scat(question,year,metric):
+    merged_data = dh.smoking(question, year,metric)
+        
+        # Create scatter plot
+    fig = px.scatter(merged_data, x='datavalue', y='rate', color='locationdesc',
+                        labels={'avg_datavalue': 'Average Binge Drinking Frequency', 'avg_rate': 'Average Life Expectancy'},
+                        title=f'Life Expectancy vs Binge Drinking Frequency (Year {year})')
+    return fig
+    
 
+@dash.callback(
+    dash.Output(component_id="stress_scat",component_property="figure"),
+    dash.Input(component_id='stress_scat_qeust',component_property="value"),
+    dash.Input(component_id='stress_scat_year',component_property="value"),
+    dash.Input(component_id='stress_scat_metric',component_property="value")
+)
+def stress_scat(question,year,metric):
+    merged_data = dh.stress(question, year,metric)
+        
+        # Create scatter plot
+    fig = px.scatter(merged_data, x='datavalue', y='rate', color='locationdesc',
+                        labels={'avg_datavalue': 'Average Binge Drinking Frequency', 'avg_rate': 'Average Life Expectancy'},
+                        title=f'Life Expectancy vs Binge Drinking Frequency (Year {year})')
+    return fig
+    
 if __name__=="__main__":
     location_plot()
