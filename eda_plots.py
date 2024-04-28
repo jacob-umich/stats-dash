@@ -334,8 +334,8 @@ def plot_life_expectancy_alcohol_binge_freqq(question,year,metric):
         
         # Create scatter plot
     fig = px.scatter(merged_data, x='datavalue', y='rate', color='locationdesc',
-                        labels={'avg_datavalue': 'Average Binge Drinking Frequency', 'avg_rate': 'Average Life Expectancy'},
-                        title=f'Life Expectancy vs Binge Drinking Frequency (Year {year})')
+                        labels={'datavalue': metric, 'rate': 'Average Life Expectancy'},
+                        title=f'Life Expectancy vs {metric} of {question} (Year {year})')
     return fig
     
 
@@ -350,8 +350,8 @@ def smoking_scat(question,year,metric):
         
         # Create scatter plot
     fig = px.scatter(merged_data, x='datavalue', y='rate', color='locationdesc',
-                        labels={'avg_datavalue': 'Average Binge Drinking Frequency', 'avg_rate': 'Average Life Expectancy'},
-                        title=f'Life Expectancy vs Binge Drinking Frequency (Year {year})')
+                        labels={'datavalue': metric, 'rate': 'Average Life Expectancy'},
+                        title=f'Life Expectancy vs {metric} of {question} (Year {year})')
     return fig
     
 
@@ -366,8 +366,8 @@ def stress_scat(question,year,metric):
         
         # Create scatter plot
     fig = px.scatter(merged_data, x='datavalue', y='rate', color='locationdesc',
-                        labels={'avg_datavalue': 'Average Binge Drinking Frequency', 'avg_rate': 'Average Life Expectancy'},
-                        title=f'Life Expectancy vs Binge Drinking Frequency (Year {year})')
+                        labels={'datavalue': metric, 'rate': 'Average Life Expectancy'},
+                        title=f'Life Expectancy vs {metric} of {question} (Year {year})')
     return fig
     
 if __name__=="__main__":
