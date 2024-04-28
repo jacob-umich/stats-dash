@@ -1,0 +1,5 @@
+This graph shows a tree-like diagram of the organization of the data. At the highest level, the data can be organized by which health topic it relates to. Then, the data can be organized by the question being asked. These questions were asked to many indivduals in different states. The results from each question can be presented in many different ways depending on the question. The remaining organization groups these individuals. Finally, the way this data set is organized is each question has the same number of entries in the dataset, corresponding to the number of stratifications, but if not enough data was available for that entry, no data is recorded. To show this, a ratio of the amount of empty entries to the total amount of entries is indicated by the color of the section. For example, the non-Hispanic Hawaiian or Pacific Islander stratification is often emtpy because there was not enough data on that group. Using this, you can tell which questions have less data available for them by their color. 
+
+The size of each sector indicates the number of entries for each group.
+
+Understanding the structure of this data is crucial for its analysis. 
